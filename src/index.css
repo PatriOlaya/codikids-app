@@ -1,0 +1,112 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+:root {
+  --purple-deep:   #1a0f3c;
+  --purple-mid:    #2d1b6b;
+  --purple-main:   #534AB7;
+  --purple-light:  #7F77DD;
+  --purple-pale:   #EEEDFE;
+  --teal-main:     #1D9E75;
+  --teal-light:    #5DCAA5;
+  --amber-main:    #BA7517;
+  --amber-light:   #EF9F27;
+  --white:         #ffffff;
+  --gray-soft:     #f4f3ff;
+  --text-main:     #1a0f3c;
+  --text-muted:    #6b5fa8;
+  --radius-sm:     8px;
+  --radius-md:     14px;
+  --radius-lg:     20px;
+  --shadow-card:   0 4px 24px rgba(83,74,183,.10);
+  --font-display:  'Space Grotesk', sans-serif;
+  --font-body:     'Nunito', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--purple-deep);
+  color: var(--white);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+button { cursor: pointer; font-family: var(--font-body); }
+a { text-decoration: none; color: inherit; }
+
+.card {
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+}
+
+.btn-primary {
+  background: var(--purple-main);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: .75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: var(--font-body);
+  transition: background .15s, transform .1s;
+}
+.btn-primary:hover  { background: var(--purple-light); }
+.btn-primary:active { transform: scale(.98); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--white);
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: var(--radius-sm);
+  padding: .75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: border-color .15s, background .15s;
+}
+.btn-ghost:hover { border-color: var(--purple-light); background: rgba(127,119,221,.15); }
+
+input[type="email"],
+input[type="password"],
+input[type="text"] {
+  width: 100%;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: var(--radius-sm);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  padding: .75rem 1rem;
+  outline: none;
+  transition: border-color .15s;
+}
+input::placeholder { color: rgba(255,255,255,.4); }
+input:focus { border-color: var(--purple-light); }
+
+.xp-bar-track {
+  background: rgba(255,255,255,.10);
+  border-radius: 99px;
+  height: 10px;
+  overflow: hidden;
+}
+.xp-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--purple-main), var(--teal-light));
+  transition: width .8s cubic-bezier(.4,0,.2,1);
+}
+
+@keyframes flotar {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+@keyframes twinkle {
+  0%,100% { opacity: .3; }
+  50%      { opacity: 1; }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
