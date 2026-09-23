@@ -71,11 +71,11 @@ export default function Admin({ user, onLogout }) {
 
   function linkPadre(id) { return `${APP_URL}/padre/${id}` }
 
-  async function iniciarNivelTres() {
-    if (!estActivo || estActivo.nivel >= 3) return
-    const { error } = await supabase.from('estudiantes').update({ nivel: 3 }).eq('id', estActivo.id)
-    if (error) { mostrarToast('No se pudo activar el Nivel 3'); return }
-    mostrarToast('Nivel 3 activado para ' + estActivo.nombre)
+  async function cambiarNivel(nivel) {
+    if (!estActivo || estActivo.nivel === nivel) return
+    const { error } = await supabase.from('estudiantes').update({ nivel }).eq('id', estActivo.id)
+    if (error) { mostrarToast('No se pudo cambiar el nivel'); return }
+    mostrarToast(`Nivel ${nivel} seleccionado para ${estActivo.nombre}`)
     cargarDatos()
   }
 
@@ -92,6 +92,10 @@ export default function Admin({ user, onLogout }) {
   const inventosEst = inventos.filter(i => i.estudiante_id === estudianteActivo)
   const completadas = progresoEst.filter(p => p.completada).length
   const nivelCompletado = misionesNivel.length > 0 && completadas === misionesNivel.length
+  const fechaFinalizacion = nivelCompletado
+    ? new Date(Math.max(...progresoEst.map(p => new Date(p.completada_at || 0).getTime())))
+        .toLocaleDateString('es-CO', { year:'numeric', month:'long', day:'numeric' })
+    : null
 
   return (
     <div style={{ minHeight:'100vh', background:'radial-gradient(ellipse at 30% 20%, #2d1b6b 0%, #1a0f3c 50%, #0a0520 100%)', fontFamily:'var(--font-body)' }}>
@@ -180,11 +184,15 @@ export default function Admin({ user, onLogout }) {
                       <div style={{ width:52, height:52, borderRadius:'50%', background:'linear-gradient(135deg,#534AB7,#5DCAA5)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:24 }}>🚀</div>
                       <div>
                         <div style={{ fontFamily:'var(--font-display)', fontWeight:700, fontSize:'1.1rem' }}>{estActivo.nombre}</div>
-                        <div style={{ fontSize:'.85rem', color:'rgba(255,255,255,.5)' }}>Nivel {estActivo.nivel} · {estActivo.xp_total} XP</div>
+                        <label htmlFor="nivel-estudiante" style={{ fontSize:'.85rem', color:'rgba(255,255,255,.5)' }}>Nivel del estudiante · {estActivo.xp_total} XP</label>
+                        <select id="nivel-estudiante" aria-label="Nivel del estudiante" value={estActivo.nivel} onChange={e => cambiarNivel(Number(e.target.value))} style={{ display:'block', marginTop:6, padding:'.35rem', borderRadius:8 }}>
+                          <option value={1}>Nivel 1 — Scratch Exploradores</option>
+                          <option value={2}>Nivel 2 — Scratch Ninja</option>
+                          <option value={3}>Nivel 3 — Scratch Maestro</option>
+                        </select>
                       </div>
                       <div style={{ marginLeft:'auto', textAlign:'right' }}>
                         <div style={{ fontWeight:700, color:'#5DCAA5', fontSize:'1.2rem' }}>{completadas}/{misionesNivel.length}</div>
-                        {estActivo.nivel === 2 && <button className="btn-primary" onClick={iniciarNivelTres}>Iniciar Nivel 3</button>}
                         <div style={{ fontSize:'.75rem', color:'rgba(255,255,255,.4)' }}>misiones</div>
                       </div>
                     </div>
@@ -206,7 +214,7 @@ export default function Admin({ user, onLogout }) {
                           <div style={{ fontSize:'.8rem', color:'rgba(255,255,255,.5)', marginTop:2 }}>Genera el certificado de {estActivo.nombre}</div>
                         </div>
                         <button className="btn-primary" style={{ background:'#BA7517', padding:'.6rem 1.2rem', fontSize:'.85rem', flexShrink:0 }}
-                          onClick={() => setCertData({ nombre: estActivo.nombre, nivel: estActivo.nivel, fecha: new Date().toLocaleDateString('es-CO', { year:'numeric', month:'long', day:'numeric' }) })}>
+                          onClick={() => setCertData({ nombre: estActivo.nombre, nivel: estActivo.nivel, fecha: fechaFinalizacion })}>
                           📜 Generar certificado
                         </button>
                       </div>

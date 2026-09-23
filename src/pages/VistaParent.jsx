@@ -52,7 +52,7 @@ export default function VistaParent() {
             El mundo de {estudiante.nombre}
           </h1>
           <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '.9rem', marginTop: '.4rem' }}>
-            Nivel 2 · Scratch Ninja
+            Nivel {estudiante.nivel} · {estudiante.nivel === 3 ? 'Scratch Maestro' : estudiante.nivel === 1 ? 'Scratch Exploradores' : 'Scratch Ninja'}
           </p>
         </div>
 

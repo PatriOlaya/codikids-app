@@ -105,7 +105,7 @@ export default function Laboratorio({ user, onLogout }) {
             </div>
             <div style={{ width: '100%' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '.85rem', marginBottom: '.4rem' }}>
-                <span style={{ color: 'rgba(255,255,255,.6)' }}>Nivel 2 · Scratch Ninja</span>
+                <span style={{ color: 'rgba(255,255,255,.6)' }}>Nivel {estudiante?.nivel} · {estudiante?.nivel === 3 ? 'Scratch Maestro' : estudiante?.nivel === 1 ? 'Scratch Exploradores' : 'Scratch Ninja'}</span>
                 <span style={{ color: '#7F77DD', fontWeight: 700 }}>{pct}%</span>
               </div>
               <div className="xp-bar-track"><div className="xp-bar-fill" style={{ width: `${pct}%` }} /></div>
@@ -178,7 +178,7 @@ export default function Laboratorio({ user, onLogout }) {
 
         {/* ── Mapa de Aventura ── */}
         <div className="card" style={{ marginBottom:'1.5rem' }}>
-          <h2 style={{ fontFamily:'var(--font-display)', fontWeight:600, fontSize:'1rem', marginBottom:'1.25rem' }}>🗺 Mapa de Aventura — Nivel 2</h2>
+          <h2 style={{ fontFamily:'var(--font-display)', fontWeight:600, fontSize:'1rem', marginBottom:'1.25rem' }}>🗺 Mapa de Aventura — Nivel {estudiante?.nivel}</h2>
           <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:'.75rem', marginBottom:'1rem' }}>
             {misiones.map((m, i) => {
               const completada   = progreso.some(p => p.mision_id === m.id && p.completada)
