@@ -43,13 +43,16 @@ export default function Laboratorio({ user, onLogout }) {
   async function cargarDatos() {
     const [{ data: est }, { data: mis }, { data: prog }, { data: inv }] = await Promise.all([
       supabase.from('estudiantes').select('*').eq('id', user.id).single(),
-      supabase.from('misiones').select('*').eq('nivel', 2).order('numero'),
+      supabase.from('misiones').select('*').order('numero'),
       supabase.from('progreso').select('*').eq('estudiante_id', user.id),
       supabase.from('inventos').select('*').eq('estudiante_id', user.id).order('created_at', { ascending: false })
     ])
     setEstudiante(est)
-    setMisiones(mis || [])
-    setProgreso(prog || [])
+    const nivel = est?.nivel || 2
+    const misionesActuales = (mis || []).filter(m => m.nivel === nivel)
+    const ids = new Set(misionesActuales.map(m => m.id))
+    setMisiones(misionesActuales)
+    setProgreso((prog || []).filter(p => ids.has(p.mision_id)))
     setInventos(inv || [])
     setLoading(false)
   }
