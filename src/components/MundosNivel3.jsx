@@ -1,6 +1,6 @@
 import { MUNDOS_NIVEL_TRES } from '../data/nivelTres'
 
-export default function MundosNivel3({ misiones, progreso, inventos, onSubir, lectura = false }) {
+export default function MundosNivel3({ misiones, progreso, inventos, onSubir, onJugar, lectura = false }) {
   const idsNivel = new Set(misiones.map(m => m.id))
   const entregadas = new Set(inventos.filter(i => idsNivel.has(i.mision_id)).map(i => i.mision_id))
   const aprobadas = new Set(progreso.filter(p => p.completada).map(p => p.mision_id))
@@ -37,6 +37,7 @@ export default function MundosNivel3({ misiones, progreso, inventos, onSubir, le
                 <div style={{ fontSize:'.72rem', marginTop:9, color:aprobada ? '#8eecc1' : entregada ? '#ffd166' : activa ? '#fff' : 'rgba(255,255,255,.55)' }}>
                   {aprobada ? '✓ Aprobado por tu profe' : entregada ? '✓ Entregado · en revisión' : activa ? '★ Reto disponible' : '🔒 Sube el experimento anterior'}
                 </div>
+                {!lectura && abierta && <button className="btn-primary" style={{ fontSize:'.75rem', marginTop:9, width:'100%' }} onClick={onJugar}>🎮 Crear y jugar</button>}
                 {!lectura && entregada && !aprobada && <button className="btn-ghost" style={{ fontSize:'.72rem', marginTop:8 }} onClick={() => onSubir(m.id)}>Enviar nueva versión</button>}
               </div>
             </div>
@@ -51,7 +52,7 @@ export default function MundosNivel3({ misiones, progreso, inventos, onSubir, le
           <p style={{ lineHeight:1.5, margin:'0 0 8px' }}>{mundo.reto}</p>
           <p style={{ lineHeight:1.5, fontSize:'.84rem', color:'rgba(255,255,255,.75)' }}><strong>Para superar el reto:</strong> {mundo.prueba}</p>
           <div style={{ fontSize:'.79rem', color:'#b8fff1' }}>Al subir esta versión del juego se abrirá el siguiente mundo. Tu profe la revisará antes de darte XP.</div>
-          {!lectura && <button className="btn-primary" style={{ marginTop:14 }} onClick={() => onSubir(retoActivo.id)}>Subir mi experimento y abrir el siguiente mundo</button>}
+          {!lectura && <div style={{display:'flex',gap:9,flexWrap:'wrap',marginTop:14}}><button className="btn-primary" onClick={onJugar}>🎮 Abrir mi juego</button><button className="btn-primary" onClick={() => onSubir(retoActivo.id)}>Subir mi experimento y abrir el siguiente mundo</button></div>}
         </div>
       })()}
       {!retoActivo && misiones.length > 0 && <p style={{ marginTop:16, color:'#b8fff1' }}>¡Entregaste los ocho experimentos! Tu profe aprobará las misiones para activar el certificado.</p>}

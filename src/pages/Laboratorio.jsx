@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import Planeta from '../components/Planeta'
 import MundosNivel3 from '../components/MundosNivel3'
+import TallerPlataformas from '../components/TallerPlataformas'
 import Avatar from '../components/Avatar'
 import ConstructorAvatar from './ConstructorAvatar'
 import MinijuegoEstrellas from '../components/MinijuegoEstrellas'
@@ -18,6 +19,7 @@ export default function Laboratorio({ user, onLogout }) {
   const [loading, setLoading]           = useState(true)
   const [modalInvento, setModalInvento] = useState(null)
   const [enConstructor, setEnConstructor] = useState(false)
+  const [enTaller, setEnTaller] = useState(false)
   const [enMinijuego, setEnMinijuego]     = useState(false)
   const [enCodigoRoto, setEnCodigoRoto]   = useState(false)
   const [cajaAbierta, setCajaAbierta]     = useState(false)
@@ -64,6 +66,8 @@ export default function Laboratorio({ user, onLogout }) {
   const pct                 = totalMisiones > 0 ? Math.round((misionesCompletadas / totalMisiones) * 100) : 0
 
   if (loading) return <Cargando />
+
+  if (enTaller) return <TallerPlataformas estudianteId={user.id} misiones={misiones} inventos={inventos} onVolver={() => { setEnTaller(false); cargarDatos() }} />
 
   if (enConstructor) return (
     <ConstructorAvatar
@@ -180,7 +184,7 @@ export default function Laboratorio({ user, onLogout }) {
 
         </>}
 
-        {estudiante?.nivel === 3 && <MundosNivel3 misiones={misiones} progreso={progreso} inventos={inventos} onSubir={misionId => setModalInvento({ misionId })} />}
+        {estudiante?.nivel === 3 && <MundosNivel3 misiones={misiones} progreso={progreso} inventos={inventos} onJugar={() => setEnTaller(true)} onSubir={misionId => setModalInvento({ misionId })} />}
 
         {/* ── Mapa de Aventura ── */}
         {estudiante?.nivel !== 3 && (
