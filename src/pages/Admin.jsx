@@ -21,7 +21,7 @@ export default function Admin({ user, onLogout }) {
   async function cargarDatos() {
     const [{ data: ests }, { data: mis }, { data: inv }, { data: prog }] = await Promise.all([
       supabase.from('estudiantes').select('*').order('nombre'),
-      supabase.from('misiones').select('*').eq('nivel', 2).order('numero'),
+      supabase.from('misiones').select('*').order('numero'),
       supabase.from('inventos').select('*').order('created_at', { ascending: false }),
       supabase.from('progreso').select('*')
     ])
@@ -71,6 +71,14 @@ export default function Admin({ user, onLogout }) {
 
   function linkPadre(id) { return `${APP_URL}/padre/${id}` }
 
+  async function cambiarNivel(nivel) {
+    if (!estActivo || estActivo.nivel === nivel) return
+    const { error } = await supabase.from('estudiantes').update({ nivel }).eq('id', estActivo.id)
+    if (error) { mostrarToast('No se pudo cambiar el nivel'); return }
+    mostrarToast(`Nivel ${nivel} seleccionado para ${estActivo.nombre}`)
+    cargarDatos()
+  }
+
   if (loading) return (
     <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'#1a0f3c' }}>
       <div style={{ fontSize:48, animation:'flotar 2s ease-in-out infinite' }}>🚀</div>
@@ -78,10 +86,16 @@ export default function Admin({ user, onLogout }) {
   )
 
   const estActivo   = estudiantes.find(e => e.id === estudianteActivo)
-  const progresoEst = progreso.filter(p => p.estudiante_id === estudianteActivo)
+  const misionesNivel = misiones.filter(m => m.nivel === estActivo?.nivel)
+  const idsNivel = new Set(misionesNivel.map(m => m.id))
+  const progresoEst = progreso.filter(p => p.estudiante_id === estudianteActivo && idsNivel.has(p.mision_id))
   const inventosEst = inventos.filter(i => i.estudiante_id === estudianteActivo)
   const completadas = progresoEst.filter(p => p.completada).length
-  const nivelCompletado = misiones.length > 0 && completadas === misiones.length
+  const nivelCompletado = misionesNivel.length > 0 && completadas === misionesNivel.length
+  const fechaFinalizacion = nivelCompletado
+    ? new Date(Math.max(...progresoEst.map(p => new Date(p.completada_at || 0).getTime())))
+        .toLocaleDateString('es-CO', { year:'numeric', month:'long', day:'numeric' })
+    : null
 
   return (
     <div style={{ minHeight:'100vh', background:'radial-gradient(ellipse at 30% 20%, #2d1b6b 0%, #1a0f3c 50%, #0a0520 100%)', fontFamily:'var(--font-body)' }}>
@@ -141,14 +155,15 @@ export default function Admin({ user, onLogout }) {
                 <div className="card" style={{ padding:'1rem', marginBottom:'1rem' }}>
                   <div style={{ fontFamily:'var(--font-display)', fontWeight:600, fontSize:'.9rem', marginBottom:'.75rem' }}>Inventores</div>
                   {estudiantes.map(est => {
-                    const comp = progreso.filter(p => p.estudiante_id === est.id && p.completada).length
+                    const ids = new Set(misiones.filter(m => m.nivel === est.nivel).map(m => m.id))
+                    const comp = progreso.filter(p => p.estudiante_id === est.id && p.completada && ids.has(p.mision_id)).length
                     const activo = estudianteActivo === est.id
                     return (
                       <div key={est.id} onClick={() => setEstudianteActivo(est.id)} style={{ display:'flex', alignItems:'center', gap:'.6rem', padding:'.6rem .75rem', borderRadius:10, cursor:'pointer', background: activo ? 'rgba(127,119,221,.2)' : 'transparent', border: activo ? '1px solid rgba(127,119,221,.4)' : '1px solid transparent', marginBottom:4, transition:'all .15s' }}>
                         <div style={{ width:32, height:32, borderRadius:'50%', background:'linear-gradient(135deg,#534AB7,#5DCAA5)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:14, flexShrink:0 }}>🚀</div>
                         <div>
                           <div style={{ fontWeight:600, fontSize:'.85rem' }}>{est.nombre}</div>
-                          <div style={{ fontSize:'.72rem', color:'rgba(255,255,255,.45)' }}>{comp}/{misiones.length} misiones</div>
+                          <div style={{ fontSize:'.72rem', color:'rgba(255,255,255,.45)' }}>Nivel {est.nivel} · {comp}/{ids.size} misiones</div>
                         </div>
                       </div>
                     )
@@ -169,10 +184,15 @@ export default function Admin({ user, onLogout }) {
                       <div style={{ width:52, height:52, borderRadius:'50%', background:'linear-gradient(135deg,#534AB7,#5DCAA5)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:24 }}>🚀</div>
                       <div>
                         <div style={{ fontFamily:'var(--font-display)', fontWeight:700, fontSize:'1.1rem' }}>{estActivo.nombre}</div>
-                        <div style={{ fontSize:'.85rem', color:'rgba(255,255,255,.5)' }}>Nivel {estActivo.nivel} · {estActivo.xp_total} XP</div>
+                        <label htmlFor="nivel-estudiante" style={{ fontSize:'.85rem', color:'rgba(255,255,255,.5)' }}>Nivel del estudiante · {estActivo.xp_total} XP</label>
+                        <select id="nivel-estudiante" aria-label="Nivel del estudiante" value={estActivo.nivel} onChange={e => cambiarNivel(Number(e.target.value))} style={{ display:'block', marginTop:6, padding:'.35rem', borderRadius:8 }}>
+                          <option value={1}>Nivel 1 — Scratch Exploradores</option>
+                          <option value={2}>Nivel 2 — Scratch Ninja</option>
+                          <option value={3}>Nivel 3 — Scratch Maestro</option>
+                        </select>
                       </div>
                       <div style={{ marginLeft:'auto', textAlign:'right' }}>
-                        <div style={{ fontWeight:700, color:'#5DCAA5', fontSize:'1.2rem' }}>{completadas}/{misiones.length}</div>
+                        <div style={{ fontWeight:700, color:'#5DCAA5', fontSize:'1.2rem' }}>{completadas}/{misionesNivel.length}</div>
                         <div style={{ fontSize:'.75rem', color:'rgba(255,255,255,.4)' }}>misiones</div>
                       </div>
                     </div>
@@ -194,14 +214,14 @@ export default function Admin({ user, onLogout }) {
                           <div style={{ fontSize:'.8rem', color:'rgba(255,255,255,.5)', marginTop:2 }}>Genera el certificado de {estActivo.nombre}</div>
                         </div>
                         <button className="btn-primary" style={{ background:'#BA7517', padding:'.6rem 1.2rem', fontSize:'.85rem', flexShrink:0 }}
-                          onClick={() => setCertData({ nombre: estActivo.nombre, nivel: estActivo.nivel, fecha: new Date().toLocaleDateString('es-CO', { year:'numeric', month:'long', day:'numeric' }) })}>
+                          onClick={() => setCertData({ nombre: estActivo.nombre, nivel: estActivo.nivel, fecha: fechaFinalizacion })}>
                           📜 Generar certificado
                         </button>
                       </div>
                     ) : (
                       <div style={{ background:'rgba(255,255,255,.04)', border:'1px solid rgba(255,255,255,.08)', borderRadius:12, padding:'1rem', display:'flex', alignItems:'center', gap:12 }}>
                         <div style={{ fontSize:24 }}>📜</div>
-                        <div style={{ fontSize:'.85rem', color:'rgba(255,255,255,.5)' }}>El certificado estará disponible cuando {estActivo.nombre} complete las {misiones.length} misiones ({completadas}/{misiones.length} completadas)</div>
+                        <div style={{ fontSize:'.85rem', color:'rgba(255,255,255,.5)' }}>El certificado estará disponible cuando {estActivo.nombre} complete las {misionesNivel.length} misiones ({completadas}/{misionesNivel.length} completadas)</div>
                       </div>
                     )}
                   </div>
@@ -218,14 +238,15 @@ export default function Admin({ user, onLogout }) {
             <div className="card" style={{ padding:'1rem', height:'fit-content' }}>
               <div style={{ fontFamily:'var(--font-display)', fontWeight:600, fontSize:'.9rem', marginBottom:'.75rem' }}>Inventores</div>
               {estudiantes.map(est => {
-                const comp = progreso.filter(p => p.estudiante_id === est.id && p.completada).length
+                const ids = new Set(misiones.filter(m => m.nivel === est.nivel).map(m => m.id))
+                const comp = progreso.filter(p => p.estudiante_id === est.id && p.completada && ids.has(p.mision_id)).length
                 const activo = estudianteActivo === est.id
                 return (
                   <div key={est.id} onClick={() => setEstudianteActivo(est.id)} style={{ display:'flex', alignItems:'center', gap:'.6rem', padding:'.6rem .75rem', borderRadius:10, cursor:'pointer', background: activo ? 'rgba(127,119,221,.2)' : 'transparent', border: activo ? '1px solid rgba(127,119,221,.4)' : '1px solid transparent', marginBottom:4 }}>
                     <div style={{ width:32, height:32, borderRadius:'50%', background:'linear-gradient(135deg,#534AB7,#5DCAA5)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:14 }}>🚀</div>
                     <div>
                       <div style={{ fontWeight:600, fontSize:'.85rem' }}>{est.nombre}</div>
-                      <div style={{ fontSize:'.72rem', color:'rgba(255,255,255,.45)' }}>{comp}/{misiones.length} misiones</div>
+                      <div style={{ fontSize:'.72rem', color:'rgba(255,255,255,.45)' }}>Nivel {est.nivel} · {comp}/{ids.size} misiones</div>
                     </div>
                   </div>
                 )
@@ -237,10 +258,10 @@ export default function Admin({ user, onLogout }) {
                 <div className="card">
                   <div style={{ display:'flex', alignItems:'center', gap:'1rem', marginBottom:'1rem' }}>
                     <div style={{ fontFamily:'var(--font-display)', fontWeight:700 }}>{estActivo.nombre}</div>
-                    <div style={{ fontSize:'.85rem', color:'rgba(255,255,255,.5)' }}>· {completadas}/{misiones.length} misiones · {estActivo.xp_total} XP</div>
+                    <div style={{ fontSize:'.85rem', color:'rgba(255,255,255,.5)' }}>· {completadas}/{misionesNivel.length} misiones · {estActivo.xp_total} XP</div>
                   </div>
                   <div style={{ display:'flex', flexDirection:'column', gap:'.6rem' }}>
-                    {misiones.map(m => {
+                    {misionesNivel.map(m => {
                       const prog    = progresoEst.find(p => p.mision_id === m.id)
                       const completada = prog?.completada
                       const invento = inventosEst.find(i => i.mision_id === m.id)
@@ -353,6 +374,7 @@ function ModalNuevoEstudiante({ onClose, onCreado, onError }) {
             <select value={nivel} onChange={e => setNivel(Number(e.target.value))} style={{ width:'100%', background:'rgba(255,255,255,.08)', border:'1px solid rgba(255,255,255,.18)', borderRadius:'var(--radius-sm)', color:'#fff', fontFamily:'var(--font-body)', fontSize:'1rem', padding:'.75rem 1rem' }}>
               <option value={1}>Nivel 1 — Scratch Exploradores</option>
               <option value={2}>Nivel 2 — Scratch Ninja</option>
+              <option value={3}>Nivel 3 — Scratch Maestro</option>
             </select>
           </div>
           <div style={{ background:'rgba(29,158,117,.1)', border:'1px solid rgba(29,158,117,.2)', borderRadius:10, padding:'10px 14px', fontSize:'.82rem', color:'rgba(255,255,255,.55)', lineHeight:1.6 }}>

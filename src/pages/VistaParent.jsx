@@ -17,14 +17,16 @@ export default function VistaParent() {
   async function cargarDatos() {
     const [{ data: est }, { data: mis }, { data: prog }, { data: inv }] = await Promise.all([
       supabase.from('estudiantes').select('*').eq('id', estudianteId).single(),
-      supabase.from('misiones').select('*').eq('nivel', 2).order('numero'),
+      supabase.from('misiones').select('*').order('numero'),
       supabase.from('progreso').select('*').eq('estudiante_id', estudianteId),
       supabase.from('inventos').select('*').eq('estudiante_id', estudianteId).order('created_at', { ascending: false })
     ])
     if (!est) { setError(true); setLoading(false); return }
     setEstudiante(est)
-    setMisiones(mis || [])
-    setProgreso(prog || [])
+    const misionesActuales = (mis || []).filter(m => m.nivel === est.nivel)
+    const ids = new Set(misionesActuales.map(m => m.id))
+    setMisiones(misionesActuales)
+    setProgreso((prog || []).filter(p => ids.has(p.mision_id)))
     setInventos(inv || [])
     setLoading(false)
   }
@@ -50,7 +52,7 @@ export default function VistaParent() {
             El mundo de {estudiante.nombre}
           </h1>
           <p style={{ color: 'rgba(255,255,255,.5)', fontSize: '.9rem', marginTop: '.4rem' }}>
-            Nivel 2 · Scratch Ninja
+            Nivel {estudiante.nivel} · {estudiante.nivel === 3 ? 'Scratch Maestro' : estudiante.nivel === 1 ? 'Scratch Exploradores' : 'Scratch Ninja'}
           </p>
         </div>
 
