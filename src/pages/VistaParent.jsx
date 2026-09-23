@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import Planeta from '../components/Planeta'
+import MundosNivel3 from '../components/MundosNivel3'
 
 export default function VistaParent() {
   const { estudianteId } = useParams()
@@ -57,6 +58,7 @@ export default function VistaParent() {
         </div>
 
         {/* Planeta */}
+        {estudiante.nivel !== 3 && (
         <div className="card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.25rem', marginBottom: '1.25rem' }}>
           <div style={{ width: '100%', maxWidth: 260, animation: 'flotar 5s ease-in-out infinite' }}>
             <Planeta misionesCompletadas={completadas} totalMisiones={total} />
@@ -69,6 +71,9 @@ export default function VistaParent() {
             <div className="xp-bar-track"><div className="xp-bar-fill" style={{ width: `${pct}%` }} /></div>
           </div>
         </div>
+        )}
+
+        {estudiante.nivel === 3 && <MundosNivel3 misiones={misiones} progreso={progreso} inventos={inventos} lectura />}
 
         {/* Stats */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '1rem', marginBottom: '1.25rem' }}>
@@ -78,6 +83,7 @@ export default function VistaParent() {
         </div>
 
         {/* Misiones */}
+        {estudiante.nivel !== 3 && (
         <div className="card" style={{ marginBottom: '1.25rem' }}>
           <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '1rem', marginBottom: '1rem' }}>
             Progreso de misiones 🗺
@@ -98,6 +104,7 @@ export default function VistaParent() {
             })}
           </div>
         </div>
+        )}
 
         {/* Inventos */}
         {inventos.length > 0 && (

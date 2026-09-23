@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import Planeta from '../components/Planeta'
+import MundosNivel3 from '../components/MundosNivel3'
 import Avatar from '../components/Avatar'
 import ConstructorAvatar from './ConstructorAvatar'
 import MinijuegoEstrellas from '../components/MinijuegoEstrellas'
@@ -97,6 +98,7 @@ export default function Laboratorio({ user, onLogout }) {
           <button className="btn-ghost" onClick={onLogout} style={{ padding: '.5rem 1rem', fontSize: '.85rem' }}>Salir</button>
         </header>
 
+        {estudiante?.nivel !== 3 && <>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
           <div className="card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
             <div style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '1rem', alignSelf: 'flex-start' }}>Mi Planeta 🌍</div>
@@ -176,7 +178,12 @@ export default function Laboratorio({ user, onLogout }) {
           </div>
         </div>
 
+        </>}
+
+        {estudiante?.nivel === 3 && <MundosNivel3 misiones={misiones} progreso={progreso} inventos={inventos} onSubir={misionId => setModalInvento({ misionId })} />}
+
         {/* ── Mapa de Aventura ── */}
+        {estudiante?.nivel !== 3 && (
         <div className="card" style={{ marginBottom:'1.5rem' }}>
           <h2 style={{ fontFamily:'var(--font-display)', fontWeight:600, fontSize:'1rem', marginBottom:'1.25rem' }}>🗺 Mapa de Aventura — Nivel {estudiante?.nivel}</h2>
           <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:'.75rem', marginBottom:'1rem' }}>
@@ -211,10 +218,12 @@ export default function Laboratorio({ user, onLogout }) {
           </div>
         </div>
 
+        )}
+
         <div className="card">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
             <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '1rem' }}>Mis Inventos 🔬</h2>
-            <button className="btn-primary" style={{ padding: '.5rem 1rem', fontSize: '.85rem' }} onClick={() => setModalInvento({})}>+ Nuevo invento</button>
+            {estudiante?.nivel !== 3 && <button className="btn-primary" style={{ padding: '.5rem 1rem', fontSize: '.85rem' }} onClick={() => setModalInvento({})}>+ Nuevo invento</button>}
           </div>
           {inventos.length === 0
             ? <p style={{ color: 'rgba(255,255,255,.4)', fontSize: '.9rem' }}>Sube tu primer invento cuando completes una misión 🚀</p>
@@ -225,10 +234,10 @@ export default function Laboratorio({ user, onLogout }) {
         </div>
 
         {/* Insignias */}
-        <Insignias
+        {estudiante?.nivel !== 3 && <Insignias
           misionesCompletadas={misionesCompletadas}
           habilidades={estudiante?.habilidades || []}
-        />
+        />}
 
       </div>
 
@@ -243,8 +252,9 @@ export default function Laboratorio({ user, onLogout }) {
       {modalInvento !== null && (
         <ModalInvento
           userId={user.id}
-          misiones={misiones}
+          misiones={estudiante?.nivel === 3 ? misiones.filter(m => m.id === modalInvento?.misionId) : misiones}
           misionIdInicial={modalInvento?.misionId}
+          obligatorio={estudiante?.nivel === 3}
           onClose={() => setModalInvento(null)}
           onGuardado={() => { setModalInvento(null); cargarDatos() }}
         />
@@ -322,18 +332,20 @@ function InventoCard({ invento }) {
   )
 }
 
-function ModalInvento({ userId, misiones, misionIdInicial, onClose, onGuardado }) {
+function ModalInvento({ userId, misiones, misionIdInicial, obligatorio = false, onClose, onGuardado }) {
   const [titulo, setTitulo]           = useState('')
   const [descripcion, setDescripcion] = useState('')
   const [url, setUrl]                 = useState('')
   const [misionId, setMisionId]       = useState(misionIdInicial || '')
   const [saving, setSaving]           = useState(false)
+  const [error, setError]             = useState('')
 
   async function guardar() {
-    if (!titulo || !url) return
+    if (!titulo || !url || (obligatorio && !misionId)) return
     setSaving(true)
-    await supabase.from('inventos').insert({ estudiante_id: userId, mision_id: misionId || null, titulo, descripcion, scratch_url: url })
+    const { error: insertError } = await supabase.from('inventos').insert({ estudiante_id: userId, mision_id: misionId || null, titulo, descripcion, scratch_url: url })
     setSaving(false)
+    if (insertError) { setError('No se guardó el experimento. Intenta de nuevo.'); return }
     onGuardado()
   }
 
@@ -345,10 +357,11 @@ function ModalInvento({ userId, misiones, misionIdInicial, onClose, onGuardado }
           <input type="text" placeholder="Nombre de tu invento" value={titulo} onChange={e => setTitulo(e.target.value)} />
           <input type="text" placeholder="Descripción (opcional)" value={descripcion} onChange={e => setDescripcion(e.target.value)} />
           <input type="text" placeholder="Link de Scratch (https://scratch.mit.edu/...)" value={url} onChange={e => setUrl(e.target.value)} />
-          <select value={misionId} onChange={e => setMisionId(e.target.value)} style={{ background: 'rgba(255,255,255,.08)', border: '1px solid rgba(255,255,255,.18)', borderRadius: 'var(--radius-sm)', color: '#fff', padding: '.75rem 1rem', fontFamily: 'var(--font-body)', fontSize: '1rem' }}>
-            <option value="">Misión relacionada (opcional)</option>
+          <select value={misionId} onChange={e => setMisionId(e.target.value)} disabled={obligatorio} style={{ background: 'rgba(255,255,255,.08)', border: '1px solid rgba(255,255,255,.18)', borderRadius: 'var(--radius-sm)', color: '#fff', padding: '.75rem 1rem', fontFamily: 'var(--font-body)', fontSize: '1rem' }}>
+            {!obligatorio && <option value="">Misión relacionada (opcional)</option>}
             {misiones.map(m => <option key={m.id} value={m.id}>{m.titulo}</option>)}
           </select>
+          {error && <p role="alert" style={{ color:'#ff9b8c' }}>{error}</p>}
           <p style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.45)', lineHeight: 1.5 }}>
             Tu profe revisará tu invento y aprobará la misión cuando esté listo ✨
           </p>

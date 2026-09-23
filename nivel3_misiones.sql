@@ -1,17 +1,28 @@
--- Ejecutar una sola vez en Supabase > SQL Editor del proyecto PLATAFORM CODIKIDS.
--- No modifica las misiones ni el progreso de niveles anteriores.
+-- Ejecutar en SQL Editor del proyecto PLATAFORM CODIKIDS.
+-- Se puede repetir: actualiza las misiones existentes por número y conserva sus IDs y progreso.
+with mundos(numero, titulo, descripcion, xp_reward, elemento_planeta) as (values
+ (1, 'Bosque de los Saltos', 'Crea a tu héroe y el primer tramo del juego. Programa caminar, saltar y caer con gravedad. Prueba: recorre el suelo y salta sin quedarse flotando.', 80, 'bosque'),
+ (2, 'Islas Suspendidas', 'Dibuja plataformas de distintas alturas y programa aterrizajes y choques desde los lados. Prueba: salta entre plataformas sin atravesarlas ni pararse en el aire.', 80, 'islas'),
+ (3, 'Cueva Espejo', 'Alarga el recorrido, mueve la cámara con suavidad y crea tres capas de fondo a distintas velocidades. Prueba: el fondo da profundidad sin sacudidas ni mareos.', 80, 'cueva'),
+ (4, 'Desierto Eléctrico', 'Inventa una trampa y un enemigo; programa vidas, daño y unos segundos de protección. Prueba: al tocar el peligro pierde una sola vida y sigue jugando.', 80, 'desierto'),
+ (5, 'Ciudad de Poderes', 'Crea un poder temporal de velocidad o salto y una meta que se abre al recoger objetos. Prueba: el poder termina a tiempo y la meta exige los objetos.', 80, 'ciudad_poderes'),
+ (6, 'Castillo del Guardián', 'Diseña un jefe con patrón de movimiento, barra de vida y zonas claras para golpear. Prueba: se puede ganar o perder y cada golpe válido cuenta una sola vez.', 80, 'castillo'),
+ (7, 'Portal de Control', 'Añade pausa, instrucciones, sonidos y controles táctiles si quieres jugar en celular. Prueba: se puede pausar, reanudar y terminar sin controles rotos.', 80, 'portal_control'),
+ (8, 'Gran Estreno', 'Prueba el juego completo con otra persona. Corrige fallos, crea portada y publica tu versión final. Prueba: comparte el juego y explica tres decisiones de programación.', 100, 'estreno')
+)
+update public.misiones m set titulo = w.titulo, descripcion = w.descripcion, xp_reward = w.xp_reward, elemento_planeta = w.elemento_planeta
+from mundos w where m.nivel = 3 and m.numero = w.numero;
+
+with mundos(numero, titulo, descripcion, xp_reward, elemento_planeta) as (values
+ (1, 'Bosque de los Saltos', 'Crea a tu héroe y el primer tramo del juego. Programa caminar, saltar y caer con gravedad. Prueba: recorre el suelo y salta sin quedarse flotando.', 80, 'bosque'),
+ (2, 'Islas Suspendidas', 'Dibuja plataformas de distintas alturas y programa aterrizajes y choques desde los lados. Prueba: salta entre plataformas sin atravesarlas ni pararse en el aire.', 80, 'islas'),
+ (3, 'Cueva Espejo', 'Alarga el recorrido, mueve la cámara con suavidad y crea tres capas de fondo a distintas velocidades. Prueba: el fondo da profundidad sin sacudidas ni mareos.', 80, 'cueva'),
+ (4, 'Desierto Eléctrico', 'Inventa una trampa y un enemigo; programa vidas, daño y unos segundos de protección. Prueba: al tocar el peligro pierde una sola vida y sigue jugando.', 80, 'desierto'),
+ (5, 'Ciudad de Poderes', 'Crea un poder temporal de velocidad o salto y una meta que se abre al recoger objetos. Prueba: el poder termina a tiempo y la meta exige los objetos.', 80, 'ciudad_poderes'),
+ (6, 'Castillo del Guardián', 'Diseña un jefe con patrón de movimiento, barra de vida y zonas claras para golpear. Prueba: se puede ganar o perder y cada golpe válido cuenta una sola vez.', 80, 'castillo'),
+ (7, 'Portal de Control', 'Añade pausa, instrucciones, sonidos y controles táctiles si quieres jugar en celular. Prueba: se puede pausar, reanudar y terminar sin controles rotos.', 80, 'portal_control'),
+ (8, 'Gran Estreno', 'Prueba el juego completo con otra persona. Corrige fallos, crea portada y publica tu versión final. Prueba: comparte el juego y explica tres decisiones de programación.', 100, 'estreno')
+)
 insert into public.misiones (numero, nivel, titulo, descripcion, xp_reward, elemento_planeta)
-select v.numero, 3, v.titulo, v.descripcion, v.xp_reward, v.elemento_planeta
-from (values
- (1, 'Mi héroe, mi mundo', 'Elige personaje y escenario. Construye en Scratch el suelo y programa caminar y saltar con gravedad y colisiones. Entregable: una escena jugable con movimiento estable.', 80, 'continente'),
- (2, 'Un mundo en movimiento', 'Diseña plataformas alcanzables y tres capas de fondo. Programa una cámara suave y parallax discreto. Entregable: recorrer el primer tramo sin atravesar plataformas.', 80, 'oceano'),
- (3, 'Primer desafío', 'Añade un obstáculo y un enemigo con comportamiento sencillo. Programa vidas, daño con tiempo de protección y reinicio. Entregable: superar el desafío y perder una vida correctamente.', 80, 'arboles'),
- (4, 'Poder especial', 'Diseña y programa un power-up de velocidad o salto, con duración visible y retorno al estado normal. Entregable: recoger, usar y agotar el poder.', 80, 'ciudad'),
- (5, 'La misión del jugador', 'Añade objetos coleccionables, marcador y meta. Programa condiciones para abrir el siguiente tramo. Entregable: lograr la meta jugando, sin activar atajos.', 80, 'energia'),
- (6, 'Duelo final', 'Diseña un jefe con patrón claro, zona de daño y barra de vida. Programa ataques, victoria y derrota. Entregable: un combate completo y justo.', 80, 'luna'),
- (7, 'Pulido profesional', 'Integra música, efectos, pausa, controles táctiles opcionales y correcciones de colisión y cámara. Entregable: juego estable en computador y prueba en móvil si aplica.', 80, 'portal'),
- (8, 'Estreno de mi juego', 'Prueba el juego completo, corrige errores, personaliza portada e instrucciones y comparte el proyecto. Entregable: juego final propio y presentación de sus decisiones de programación.', 100, 'estrella')
-) as v(numero, titulo, descripcion, xp_reward, elemento_planeta)
-where not exists (
-  select 1 from public.misiones m where m.nivel = 3 and m.numero = v.numero
-);
+select w.numero, 3, w.titulo, w.descripcion, w.xp_reward, w.elemento_planeta from mundos w
+where not exists (select 1 from public.misiones m where m.nivel = 3 and m.numero = w.numero);
