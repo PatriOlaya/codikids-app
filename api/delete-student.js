@@ -1,23 +1,18 @@
-import { createClient } from '@supabase/supabase-js'
+import { allowPost, requireAdmin } from './_auth.js'
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+  if (!allowPost(req, res)) return
+  const auth = await requireAdmin(req, res)
+  if (!auth) return
 
-  res.setHeader('Access-Control-Allow-Origin', '*')
+  const { userId } = req.body || {}
+  if (!userId || typeof userId !== 'string') return res.status(400).json({ error: 'Falta userId' })
 
-  const { userId } = req.body
-  if (!userId) return res.status(400).json({ error: 'Falta userId' })
+  const { supabaseAdmin } = auth
+  const { error: dbError } = await supabaseAdmin.from('estudiantes').delete().eq('id', userId)
+  if (dbError) return res.status(400).json({ error: dbError.message })
 
-  const supabaseAdmin = createClient(
-    process.env.VITE_SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_KEY
-  )
-
-  try {
-    await supabaseAdmin.from('estudiantes').delete().eq('id', userId)
-    await supabaseAdmin.auth.admin.deleteUser(userId)
-    return res.status(200).json({ success: true })
-  } catch (error) {
-    return res.status(500).json({ error: error.message })
-  }
+  const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(userId)
+  if (authError) return res.status(400).json({ error: authError.message })
+  return res.status(200).json({ success: true })
 }
