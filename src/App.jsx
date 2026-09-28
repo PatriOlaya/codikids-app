@@ -8,7 +8,7 @@ const Laboratorio = lazy(() => import('./pages/Laboratorio'))
 const Admin = lazy(() => import('./pages/Admin'))
 const VistaParent = lazy(() => import('./pages/VistaParent'))
 
-const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL?.toLowerCase()
+const ADMIN_EMAIL = (import.meta.env.VITE_ADMIN_EMAIL || 'patriciaolaya23@gmail.com').toLowerCase()
 
 function LoadingScreen() {
   return <div className="app-loading" role="status" aria-live="polite"><span aria-hidden="true">🚀</span><span>Cargando CodiKids…</span></div>
