@@ -1,4 +1,3 @@
-import { useEffect, useRef } from 'react'
 import ChatCody from '../components/ChatCody'
 
 export default function Landing() {
