@@ -1,5 +1,8 @@
 User-agent: *
 Allow: /
 Disallow: /padre/
+Disallow: /admin
+Disallow: /laboratorio
+Disallow: /entrar
 
 Sitemap: https://codikids-app.vercel.app/sitemap.xml
