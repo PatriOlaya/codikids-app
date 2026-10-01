@@ -51,6 +51,19 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* KIT DESCARGABLE */}
+      <section id="aprende-a-tu-ritmo" aria-labelledby="kit-title" style={{ padding: '3rem 1.5rem', maxWidth: 900, margin: '0 auto' }}>
+        <div style={{ border: '1px solid rgba(93,202,165,.35)', borderRadius: 24, background: 'rgba(93,202,165,.06)', padding: 'clamp(1.5rem,4vw,3rem)' }}>
+          <p style={{ color: '#5DCAA5', fontWeight: 800, letterSpacing: 1 }}>KIT DE MISIONES · 8–12 AÑOS</p>
+          <h2 id="kit-title" style={{ fontFamily: 'Space Grotesk,sans-serif', fontSize: 'clamp(1.6rem,4vw,2.4rem)', lineHeight: 1.2 }}>¿Prefieres aprender programación sin clases en vivo?</h2>
+          <p style={{ color: 'rgba(255,255,255,.75)', lineHeight: 1.8 }}>Con el Kit de Misiones CODIKIDS, tu hijo crea su primer videojuego en Scratch a su ritmo. Incluye 30 misiones en español, recursos, proyectos de solución y orientación para padres.</p>
+          <p style={{ color: 'rgba(255,255,255,.65)', lineHeight: 1.7 }}>Necesita computador con teclado y un adulto para empezar. Es un kit descargable; no incluye clases en vivo ni tutorías individuales.</p>
+          <p style={{ fontWeight: 800 }}>US$19 · pago único · acceso para descargar durante 12 meses</p>
+          <a href="https://codikids-kit-misiones.p-olaya.chatgpt.site/?utm_source=codikids-vercel&utm_medium=referral&utm_campaign=kit-misiones" target="_blank" rel="noopener noreferrer" style={{ background: '#5DCAA5', color: '#0b1220', borderRadius: 14, padding: '1rem 1.5rem', fontWeight: 800, textDecoration: 'none', display: 'inline-block' }}>Ver el Kit de Misiones →</a>
+          <p style={{ color: 'rgba(255,255,255,.6)', fontSize: '.85rem', marginBottom: 0 }}>Consulta el contenido, la muestra y las condiciones antes de comprar. El pago y la entrega se realizan a través de Hotmart.</p>
+        </div>
+      </section>
+
       {/* CÓMO FUNCIONA */}
       <section id="como-funciona" style={{ padding: '5rem 1.5rem', maxWidth: 900, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
