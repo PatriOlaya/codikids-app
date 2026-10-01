@@ -317,6 +317,7 @@ export default function Admin({ user, onLogout }) {
 
       {modalNuevo && (
         <ModalNuevoEstudiante
+          user={user}
           onClose={() => setModalNuevo(false)}
           onCreado={() => { setModalNuevo(false); cargarDatos(); mostrarToast('¡Estudiante creado! ✅') }}
           onError={(msg) => mostrarToast('Error: ' + msg)}
@@ -327,7 +328,7 @@ export default function Admin({ user, onLogout }) {
 }
 
 // ── Modal crear estudiante
-function ModalNuevoEstudiante({ onClose, onCreado, onError }) {
+function ModalNuevoEstudiante({ user, onClose, onCreado, onError }) {
   const [nombre,   setNombre]   = useState('')
   const [email,    setEmail]    = useState('')
   const [password, setPassword] = useState('')
@@ -338,9 +339,11 @@ function ModalNuevoEstudiante({ onClose, onCreado, onError }) {
     if (!nombre || !email || !password) return
     setSaving(true)
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.access_token) throw new Error('Sesión expirada. Vuelve a iniciar sesión.')
       const res = await fetch('/api/create-student', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
         body: JSON.stringify({ nombre, email, password, nivel })
       })
       const data = await res.json()
