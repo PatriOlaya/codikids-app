@@ -184,7 +184,7 @@ export default function Landing() {
         </a>
         <p style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.3)', lineHeight: 1.8 }}>
           Academia virtual de programación para niños · Colombia<br/>
-          codikids.cercia.co · +57 319 357 9832
+          codikids-app.vercel.app · +57 319 357 9832
         </p>
       </footer>
     </div>

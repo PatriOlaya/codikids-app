@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { supabase } from './lib/supabase'
 
-const Landing = lazy(() => import('./pages/Landing'))
+const Landing = lazy(() => import('./marketing/PublicSite'))
 const Login = lazy(() => import('./pages/Login'))
 const Laboratorio = lazy(() => import('./pages/Laboratorio'))
 const Admin = lazy(() => import('./pages/Admin'))

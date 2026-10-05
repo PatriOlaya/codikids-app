@@ -1,8 +1,44 @@
 {
   "rewrites": [
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "source": "/curso-scratch-para-ninos",
+      "destination": "/curso-scratch-para-ninos/index.html"
+    },
+    {
+      "source": "/programacion-para-ninos-ibague",
+      "destination": "/programacion-para-ninos-ibague/index.html"
+    },
+    {
+      "source": "/blog",
+      "destination": "/blog/index.html"
+    },
+    {
+      "source": "/blog/scratch-vs-roblox-studio",
+      "destination": "/blog/scratch-vs-roblox-studio/index.html"
+    },
+    {
+      "source": "/blog/beneficios-de-aprender-programacion",
+      "destination": "/blog/beneficios-de-aprender-programacion/index.html"
+    },
+    {
+      "source": "/blog/mejor-edad-para-aprender-scratch",
+      "destination": "/blog/mejor-edad-para-aprender-scratch/index.html"
+    },
+    {
+      "source": "/entrar",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/admin",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/laboratorio",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/padre/:path*",
+      "destination": "/app.html"
     }
   ],
   "headers": [
@@ -24,6 +60,24 @@
         {
           "key": "X-Frame-Options",
           "value": "SAMEORIGIN"
+        }
+      ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/(entrar|admin|laboratorio|padre)(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
         }
       ]
     }
