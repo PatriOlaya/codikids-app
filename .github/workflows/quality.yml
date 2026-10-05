@@ -25,3 +25,4 @@ jobs:
           VITE_SUPABASE_URL: https://example.supabase.co
           VITE_SUPABASE_ANON_KEY: placeholder
           VITE_ADMIN_EMAIL: admin@example.com
+      - run: npm run check:seo
