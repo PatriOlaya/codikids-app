@@ -20,3 +20,7 @@ for (const c of CIRCUITOS) test(`Circuito completo y orientación obligatoria: $
  assert.equal(conectado(c,p).gana,true)
  p[c.path[0]].rot=1;assert.equal(conectado(c,p).gana,false)
 })
+
+test('Las metas de eficiencia son alcanzables con giros horarios',()=>{
+ for(const c of CIRCUITOS){let giros=0;for(const p of crearCircuito(c)){if(!p)continue;for(let k=0;k<4;k++)if(p.base.map(d=>(d+p.rot+k)%4).sort().join() === [...p.base].sort().join()){giros+=k;break}}assert.ok(giros<=c.objetivo,c.nombre)}
+})
