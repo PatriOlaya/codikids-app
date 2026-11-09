@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import Planeta from '../components/Planeta'
 import MundosNivel3 from '../components/MundosNivel3'
@@ -10,6 +10,8 @@ import Insignias from '../components/Insignias'
 import CodigoRoto from '../components/CodigoRoto'
 import Circuitos from '../components/Circuitos'
 
+const ArenaScratch3D = lazy(() => import('../components/ArenaScratch3D'))
+
 const INSIGNIAS = ['🌍','🌊','🌳','🏙','⚡','🌙','🌀','⭐']
 
 export default function Laboratorio({ user, onLogout }) {
@@ -20,6 +22,7 @@ export default function Laboratorio({ user, onLogout }) {
   const [loading, setLoading]           = useState(true)
   const [modalInvento, setModalInvento] = useState(null)
   const [enConstructor, setEnConstructor] = useState(false)
+  const [enArena, setEnArena] = useState(false)
   const [enCircuitos, setEnCircuitos] = useState(false)
   const [enTaller, setEnTaller] = useState(false)
   const [enMinijuego, setEnMinijuego]     = useState(false)
@@ -149,8 +152,9 @@ export default function Laboratorio({ user, onLogout }) {
         <section className="card" style={{marginBottom:'1.5rem',background:'linear-gradient(130deg,#233758,#342451)'}}>
           <h2 style={{fontSize:'1.2rem'}}>🎮 Central de desafíos</h2>
           <p style={{color:'#cfdbec',lineHeight:1.6}}>Supera operaciones de lógica, conecta reactores y pilota entre tormentas espaciales. Cada etapa añade una regla nueva.</p>
-          <div className="game-actions"><button onClick={()=>setEnCodigoRoto(true)}>🤖 Código Roto · 8 operaciones</button><button onClick={()=>setEnCircuitos(true)}>⚡ Guardianes del Circuito · Nuevo</button><button onClick={()=>setEnMinijuego(true)}>🚀 Expedición espacial · 4 sectores</button></div>
+          <div className="game-actions"><button onClick={()=>setEnArena(true)}>🎯 Islas del Código · 3D</button><button onClick={()=>setEnCodigoRoto(true)}>🤖 Código Roto · 8 operaciones</button><button onClick={()=>setEnCircuitos(true)}>⚡ Guardianes del Circuito</button><button onClick={()=>setEnMinijuego(true)}>🚀 Expedición espacial · 4 sectores</button></div>
         </section>
+        {enArena && <Suspense fallback={<div className="game-overlay"><p>Cargando Islas del Código 3D…</p><button className="btn-ghost" onClick={()=>setEnArena(false)}>Cerrar</button></div>}><ArenaScratch3D estudianteId={user.id} onCerrar={()=>setEnArena(false)} /></Suspense>}
         {enCircuitos && <Circuitos estudianteId={user.id} onCerrar={()=>setEnCircuitos(false)} />}
 
         {/* ── Mapa de Aventura ── */}
