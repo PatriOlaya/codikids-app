@@ -2,7 +2,7 @@ export const CIRCUITOS = [
  {nombre:'Encendido',size:4,path:[0,1,5,6,10,11,15],objetivo:12},
  {nombre:'Jardín solar',size:4,path:[0,4,8,9,5,6,10,11,15],objetivo:16},
  {nombre:'Estación lunar',size:5,path:[0,1,6,11,12,7,8,13,18,19,24],objetivo:20},
- {nombre:'La serpiente',size:5,path:[0,5,10,11,12,7,2,3,8,13,18,19,24],objetivo:24},
+ {nombre:'La serpiente',size:5,path:[0,5,10,11,12,7,2,3,8,13,18,19,24],objetivo:28},
  {nombre:'Laboratorio oceánico',size:6,path:[0,1,7,13,12,18,24,25,26,20,14,15,16,22,28,29,35],objetivo:32},
  {nombre:'Ciudad de neón',size:6,path:[0,6,12,13,14,8,2,3,9,15,21,20,26,32,33,34,28,29,35],objetivo:36},
  {nombre:'Núcleo volcánico',size:7,path:[0,1,8,15,14,21,28,29,30,23,16,17,18,25,32,39,40,41,48],objetivo:36},
