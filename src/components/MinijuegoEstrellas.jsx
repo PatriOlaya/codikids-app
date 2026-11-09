@@ -1,19 +1,23 @@
 import { useEffect, useRef, useState } from 'react'
 
+const SECTORES = [{nombre:'Recolección',objetivo:6,regla:'Recoge 6 estrellas antes de 45 s.'},{nombre:'Campo de meteoritos',objetivo:8,regla:'Recoge 8 cargas: los meteoritos ahora quitan vidas.'},{nombre:'Tormenta solar',objetivo:10,regla:'Corrientes laterales desvían los objetos. Reúne 10 cargas.'},{nombre:'Núcleo inestable',objetivo:14,regla:'Atrapa solo las estrellas doradas y esquiva los señuelos rojos. Reúne 14 cargas.'}]
 const STAR_COLORS = ['#EF9F27','#5DCAA5','#7F77DD','#D4537E','#378ADD','#FAC775']
 
-export default function MinijuegoEstrellas({ onCerrar }) {
+export default function MinijuegoEstrellas({ onCerrar, estudianteId = 'invitado' }) {
   const cvRef   = useRef(null)
   const stateRef = useRef({
     running:false, player:null, objects:[], particles:[],
-    bgStars:[], score:0, lives:3, timer:30, level:1,
+    bgStars:[], score:0, lives:3, timer:45, level:1,
     frame:0, spawnCount:0, keys:{left:false,right:false},
     raf:null, timerInt:null, spawnT:null
   })
+  const [record,setRecord] = useState(()=>{try{return Number(localStorage.getItem(`codikids-espacio-v2-${estudianteId}`))||0}catch{return 0}})
+  const [sectorMsg,setSectorMsg] = useState('')
+  const lastTime = useRef(0)
   const [fase, setFase] = useState('inicio') // inicio | jugando | fin
   const [finalScore, setFinalScore] = useState(0)
   const [finalLevel, setFinalLevel] = useState(1)
-  const [hud, setHud] = useState({score:0, lives:3, timer:30, level:1})
+  const [hud, setHud] = useState({score:0, lives:3, timer:45, level:1})
   const [floats, setFloats] = useState([])
   const floatId = useRef(0)
 
@@ -42,10 +46,10 @@ export default function MinijuegoEstrellas({ onCerrar }) {
     const s = stateRef.current
     s.player = {x:W/2, y:H-48, speed:5.5}
     s.objects=[]; s.particles=[]
-    s.score=0; s.lives=3; s.timer=30; s.level=1; s.spawnCount=0
+    s.score=0; s.lives=3; s.timer=45; s.level=1; s.cargas=0; s.inv=0; lastTime.current=0; s.spawnCount=0
     s.bgStars = makeBgStars(W, H)
     s.running = true
-    setFase('jugando')
+    setSectorMsg(SECTORES[0].regla); setFase('jugando')
     updateHud()
     scheduleSpawn()
     if(s.raf) cancelAnimationFrame(s.raf)
@@ -53,7 +57,7 @@ export default function MinijuegoEstrellas({ onCerrar }) {
     s.timerInt = setInterval(() => {
       if(!s.running) return
       s.timer--
-      if(s.timer<=0){ s.timer=30; s.level++ }
+      if(s.timer<=0){ endGame(); return }
       updateHud()
     }, 1000)
     loop()
@@ -74,7 +78,8 @@ export default function MinijuegoEstrellas({ onCerrar }) {
     s.spawnCount++
     let type = 'star'
     if(s.spawnCount % 8 === 0) type = 'supernova'
-    else if(s.spawnCount % 3 === 0) type = 'asteroid'
+    else if(s.spawnCount % (s.level >= 2 ? 2 : 4) === 0) type = 'asteroid'
+    else if(s.level===4 && s.spawnCount%3===0) type='decoy'
     s.objects.push({
       x: 24+Math.random()*(W-48), y:-20,
       r: type==='supernova'?16:type==='asteroid'?13+Math.random()*6:11+Math.random()*6,
@@ -165,13 +170,14 @@ export default function MinijuegoEstrellas({ onCerrar }) {
     ctx.restore()
   }
 
-  function loop() {
+  function loop(timestamp = performance.now()) {
+    const dt=Math.min(2.5, lastTime.current ? (timestamp-lastTime.current)/16.667 : 1); lastTime.current=timestamp
     const cv = cvRef.current
     const s  = stateRef.current
     if(!s.running || !cv){s.raf=null;return}
     const ctx = cv.getContext('2d')
     const W=cv.width, H=cv.height
-    s.frame++
+    s.frame+=dt; s.inv=Math.max(0,(s.inv||0)-dt)
 
     ctx.fillStyle='#0a0520'; ctx.fillRect(0,0,W,H)
     s.bgStars.forEach(st=>{
@@ -179,29 +185,33 @@ export default function MinijuegoEstrellas({ onCerrar }) {
       ctx.beginPath(); ctx.arc(st.x,st.y,st.r,0,Math.PI*2); ctx.fill()
     })
 
-    if(s.keys.left)  s.player.x=Math.max(22,s.player.x-s.player.speed)
-    if(s.keys.right) s.player.x=Math.min(W-22,s.player.x+s.player.speed)
+    if(s.keys.left)  s.player.x=Math.max(22,s.player.x-s.player.speed*dt)
+    if(s.keys.right) s.player.x=Math.min(W-22,s.player.x+s.player.speed*dt)
     drawPlayer(ctx,s.player.x,s.player.y)
 
     for(let i=s.objects.length-1;i>=0;i--){
       const o=s.objects[i]
-      o.y+=o.speed; o.rot+=o.rotS
+      o.y+=o.speed*dt; o.rot+=o.rotS*dt
+      if(s.level>=3)o.x=Math.max(18,Math.min(W-18,o.x+Math.sin(s.frame/30)*1.4*dt))
       if(o.type==='supernova') drawSupernova(ctx,o.x,o.y,o.r,o.rot,s.frame)
       else if(o.type==='asteroid') drawAsteroid(ctx,o.x,o.y,o.r,o.rot)
-      else drawStar5(ctx,o.x,o.y,o.r,o.rot,o.color)
+      else drawStar5(ctx,o.x,o.y,o.r,o.rot,o.type==='decoy'?'#ff3867':s.level===4?'#ffdd66':o.color)
 
       const dx=o.x-s.player.x, dy=o.y-s.player.y
       const hitR=o.type==='supernova'?o.r+22:o.r+18
       if(Math.sqrt(dx*dx+dy*dy)<hitR){
-        if(o.type==='star'){ addParticles(o.x,o.y,o.color,10); s.score++; showFloat(o.x,o.y-10,'+1 ⭐','#EF9F27') }
-        else if(o.type==='supernova'){ addParticles(o.x,o.y,'#FFD700',22); s.score+=5; showFloat(o.x,o.y-10,'+5 ✨','#FFD700') }
-        else if(o.type==='asteroid'){ addParticles(o.x,o.y,'#E85D4A',14); s.score=Math.max(0,s.score-2); showFloat(o.x,o.y-10,'-2 ☄️','#E85D4A') }
+        if(o.type==='star'){ s.cargas++;  addParticles(o.x,o.y,o.color,10); s.score++; showFloat(o.x,o.y-10,'+1 ⭐','#EF9F27') }
+        else if(o.type==='supernova'){ s.cargas+=3;  addParticles(o.x,o.y,'#FFD700',22); s.score+=5; showFloat(o.x,o.y-10,'+5 ✨','#FFD700') }
+        else if(o.type==='asteroid'||o.type==='decoy'){ if(s.level>=2&&s.inv<=0){s.lives--;s.inv=60} addParticles(o.x,o.y,'#E85D4A',14); s.score=Math.max(0,s.score-2); showFloat(o.x,o.y-10,'-2 ☄️','#E85D4A') }
         updateHud()
-        s.objects.splice(i,1); continue
+        s.objects.splice(i,1);
+        if(s.lives<=0){endGame();return}
+        if(s.cargas>=SECTORES[s.level-1].objetivo){if(s.level===4){setSectorMsg('¡Expedición completada!');endGame();return} s.level++;s.cargas=0;s.timer=45;s.objects=[];setSectorMsg(SECTORES[s.level-1].regla);updateHud();break}
+        continue
       }
       if(o.y>H+24){
         s.objects.splice(i,1)
-        if(o.type!=='asteroid'){ s.lives--; updateHud(); if(s.lives<=0){endGame();return} }
+        if(o.type==='star'||o.type==='supernova'){ s.lives--; updateHud(); if(s.lives<=0){endGame();return} }
       }
     }
 
@@ -216,7 +226,7 @@ export default function MinijuegoEstrellas({ onCerrar }) {
     }
 
     ctx.fillStyle='rgba(127,119,221,.7)'; ctx.font='bold 12px Nunito'; ctx.shadowBlur=0
-    ctx.fillText('NIVEL '+s.level,8,18)
+    ctx.fillText('SECTOR '+s.level+' · '+SECTORES[s.level-1].nombre+' · '+s.cargas+'/'+SECTORES[s.level-1].objetivo,8,18)
     s.raf=requestAnimationFrame(loop)
   }
 
@@ -225,6 +235,7 @@ export default function MinijuegoEstrellas({ onCerrar }) {
     s.running=false
     clearInterval(s.timerInt); clearTimeout(s.spawnT)
     setFinalScore(s.score); setFinalLevel(s.level)
+    if(s.score>record){setRecord(s.score);try{localStorage.setItem(`codikids-espacio-v2-${estudianteId}`,String(s.score))}catch{}}
     setFase('fin')
   }
 
@@ -270,6 +281,7 @@ export default function MinijuegoEstrellas({ onCerrar }) {
         <button onClick={onCerrar} style={{ background:'transparent', border:'none', color:'rgba(255,255,255,.5)', fontSize:18, cursor:'pointer' }}>✕</button>
       </div>
 
+      <div style={{padding:12,color:'#cdf5ec',fontSize:12,lineHeight:1.5}}>Sector {hud.level}: {SECTORES[hud.level-1].nombre} · {sectorMsg||SECTORES[0].regla} · Récord local: {record}</div>
       {/* Canvas */}
       <div style={{ position:'relative', background:'#0a0520' }}>
         <canvas ref={cvRef} width={420} height={320} style={{ width:'100%', display:'block' }} />
@@ -289,10 +301,10 @@ export default function MinijuegoEstrellas({ onCerrar }) {
             <div style={{ display:'flex', gap:12, flexWrap:'wrap', justifyContent:'center', fontSize:12, color:'rgba(255,255,255,.6)' }}>
               <span>⭐ +1 punto</span>
               <span style={{ color:'#FFD700' }}>✨ Supernova +5</span>
-              <span style={{ color:'#E85D4A' }}>☄️ Asteroide -2</span>
+              <span style={{ color:'#E85D4A' }}>☄️ Desde sector 2: pierdes vidas</span>
             </div>
             <div style={{ fontSize:12, color:'rgba(255,255,255,.5)', lineHeight:1.7 }}>
-              Mueve tu nave y atrapa las estrellas<br/>¡Evita los asteroides!
+              Mueve tu nave y atrapa las estrellas<br/>¡Cuatro sectores con reglas diferentes!
             </div>
             <button onClick={startGame} style={{ background:'#534AB7', border:'none', borderRadius:12, color:'#fff', fontFamily:'var(--font-body)', fontWeight:800, fontSize:15, padding:'12px 28px', cursor:'pointer', marginTop:4 }}>
               ¡Jugar ahora!
@@ -317,15 +329,17 @@ export default function MinijuegoEstrellas({ onCerrar }) {
       {/* Controles */}
       <div style={{ background:'rgba(255,255,255,.04)', borderTop:'1px solid rgba(255,255,255,.07)', padding:'12px 20px', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
         <button
-          onPointerDown={()=>pressBtn('left',true)}
+          onPointerDown={e=>{e.currentTarget.setPointerCapture(e.pointerId);pressBtn('left',true)}}
+          onPointerCancel={()=>pressBtn('left',false)}
           onPointerUp={()=>pressBtn('left',false)}
           onPointerLeave={()=>pressBtn('left',false)}
           style={{ width:64,height:64,borderRadius:'50%',border:'none',background:'#534AB7',color:'#fff',fontSize:28,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',touchAction:'none',WebkitTapHighlightColor:'transparent' }}>◀</button>
         <div style={{ textAlign:'center', color:'rgba(255,255,255,.5)', fontSize:11 }}>
-          NIVEL<div style={{ fontFamily:'var(--font-display)', fontSize:22, fontWeight:700, color:'#7F77DD' }}>{hud.level}</div>
+          SECTOR<div style={{ fontFamily:'var(--font-display)', fontSize:22, fontWeight:700, color:'#7F77DD' }}>{hud.level}</div>
         </div>
         <button
-          onPointerDown={()=>pressBtn('right',true)}
+          onPointerDown={e=>{e.currentTarget.setPointerCapture(e.pointerId);pressBtn('right',true)}}
+          onPointerCancel={()=>pressBtn('right',false)}
           onPointerUp={()=>pressBtn('right',false)}
           onPointerLeave={()=>pressBtn('right',false)}
           style={{ width:64,height:64,borderRadius:'50%',border:'none',background:'#534AB7',color:'#fff',fontSize:28,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',touchAction:'none',WebkitTapHighlightColor:'transparent' }}>▶</button>

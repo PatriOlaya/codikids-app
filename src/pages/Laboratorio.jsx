@@ -8,6 +8,7 @@ import ConstructorAvatar from './ConstructorAvatar'
 import MinijuegoEstrellas from '../components/MinijuegoEstrellas'
 import Insignias from '../components/Insignias'
 import CodigoRoto from '../components/CodigoRoto'
+import Circuitos from '../components/Circuitos'
 
 const INSIGNIAS = ['🌍','🌊','🌳','🏙','⚡','🌙','🌀','⭐']
 
@@ -19,6 +20,7 @@ export default function Laboratorio({ user, onLogout }) {
   const [loading, setLoading]           = useState(true)
   const [modalInvento, setModalInvento] = useState(null)
   const [enConstructor, setEnConstructor] = useState(false)
+  const [enCircuitos, setEnCircuitos] = useState(false)
   const [enTaller, setEnTaller] = useState(false)
   const [enMinijuego, setEnMinijuego]     = useState(false)
   const [enCodigoRoto, setEnCodigoRoto]   = useState(false)
@@ -126,48 +128,6 @@ export default function Laboratorio({ user, onLogout }) {
           </div>
         </div>
 
-        {/* Minijuego */}
-        <div className="card" style={{ marginBottom:'1.5rem' }}>
-          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'.75rem' }}>
-            <div>
-              <div style={{ fontFamily:'var(--font-display)', fontWeight:600, fontSize:'1rem' }}>🎮 Reto del Inventor</div>
-              <div style={{ fontSize:'.8rem', color:'rgba(255,255,255,.45)', marginTop:2 }}>Atrapa estrellas, evita asteroides y caza supernovas ✨</div>
-            </div>
-            <button className="btn-primary" style={{ padding:'.5rem 1.2rem', fontSize:'.85rem' }} onClick={() => setEnMinijuego(true)}>
-              ¡Jugar!
-            </button>
-          </div>
-          <div style={{ display:'flex', gap:16, fontSize:'.8rem', color:'rgba(255,255,255,.6)' }}>
-            <span>⭐ +1 estrella</span>
-            <span style={{ color:'#FFD700' }}>✨ +5 supernova</span>
-            <span style={{ color:'#E85D4A' }}>☄️ -2 asteroide</span>
-          </div>
-        </div>
-
-        {/* Código Roto */}
-        <div className="card" style={{ marginBottom:'1.5rem' }}>
-          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'.75rem' }}>
-            <div>
-              <div style={{ fontFamily:'var(--font-display)', fontWeight:600, fontSize:'1rem' }}>🔧 Código Roto</div>
-              <div style={{ fontSize:'.8rem', color:'rgba(255,255,255,.45)', marginTop:2 }}>
-                Repara el programa del robot para que llegue a la estrella ⭐
-              </div>
-            </div>
-            <button className="btn-primary" style={{ padding:'.5rem 1.2rem', fontSize:'.85rem', background:'linear-gradient(135deg,#534AB7,#1D9E75)' }} onClick={() => setEnCodigoRoto(true)}>
-              ¡Reparar!
-            </button>
-          </div>
-          <div style={{ display:'flex', gap:10, flexWrap:'wrap', fontSize:'.78rem', color:'rgba(255,255,255,.5)' }}>
-            <span>🗺 8 mapas</span>
-            <span>·</span>
-            <span>⬆ Instrucciones de movimiento</span>
-            <span>·</span>
-            <span>💎 Recoge gemas</span>
-            <span>·</span>
-            <span style={{ color:'#7F77DD' }}>Se desbloquean con tus misiones</span>
-          </div>
-        </div>
-
         {/* ── Caja Misteriosa Diaria ── */}
         <div className="card" style={{ marginBottom:'1.5rem', background: cajaDisponible ? 'rgba(83,74,183,.18)' : 'rgba(255,255,255,.04)', border:`1px solid ${cajaDisponible ? 'rgba(127,119,221,.45)' : 'rgba(255,255,255,.08)'}` }}>
           <div style={{ display:'flex', alignItems:'center', gap:'1rem' }}>
@@ -185,6 +145,13 @@ export default function Laboratorio({ user, onLogout }) {
         </>}
 
         {estudiante?.nivel === 3 && <MundosNivel3 misiones={misiones} progreso={progreso} inventos={inventos} onJugar={() => setEnTaller(true)} onSubir={misionId => setModalInvento({ misionId })} />}
+
+        <section className="card" style={{marginBottom:'1.5rem',background:'linear-gradient(130deg,#233758,#342451)'}}>
+          <h2 style={{fontSize:'1.2rem'}}>🎮 Central de desafíos</h2>
+          <p style={{color:'#cfdbec',lineHeight:1.6}}>Supera operaciones de lógica, conecta reactores y pilota entre tormentas espaciales. Cada etapa añade una regla nueva.</p>
+          <div className="game-actions"><button onClick={()=>setEnCodigoRoto(true)}>🤖 Código Roto · 8 operaciones</button><button onClick={()=>setEnCircuitos(true)}>⚡ Guardianes del Circuito · Nuevo</button><button onClick={()=>setEnMinijuego(true)}>🚀 Expedición espacial · 4 sectores</button></div>
+        </section>
+        {enCircuitos && <Circuitos estudianteId={user.id} onCerrar={()=>setEnCircuitos(false)} />}
 
         {/* ── Mapa de Aventura ── */}
         {estudiante?.nivel !== 3 && (
@@ -248,7 +215,7 @@ export default function Laboratorio({ user, onLogout }) {
       {enMinijuego && (
         <div style={{ position:'fixed', inset:0, background:'rgba(10,5,32,.88)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:100, padding:'1rem' }} onClick={() => setEnMinijuego(false)}>
           <div onClick={e => e.stopPropagation()}>
-            <MinijuegoEstrellas onCerrar={() => setEnMinijuego(false)} />
+            <MinijuegoEstrellas estudianteId={user.id} onCerrar={() => setEnMinijuego(false)} />
           </div>
         </div>
       )}
@@ -266,7 +233,7 @@ export default function Laboratorio({ user, onLogout }) {
 
       {enCodigoRoto && (
         <CodigoRoto
-          misionesCompletadas={misionesCompletadas}
+          estudianteId={user.id}
           onCerrar={() => setEnCodigoRoto(false)}
         />
       )}
