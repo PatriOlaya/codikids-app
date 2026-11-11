@@ -1,7 +1,7 @@
 import './galeria-desafios.css'
 
 const JUEGOS=[
- {id:'nucita',titulo:'Nucita: el misterio del parque',tipo:'Cuento interactivo',detalle:'Busca pistas, programa el farol y elige el final.',color:'#e4bbfa',fondo:'#43275d'},
+ {id:'nucita',titulo:'Nucita: el misterio del parque',tipo:'Cuento interactivo',detalle:'Resuelve el misterio del farol, explora dos rutas y descubre cuatro finales.',color:'#e4bbfa',fondo:'#43275d'},
  {id:'islas',titulo:'Islas del Código',tipo:'Aventura 3D',detalle:'Salta entre islas, esquiva pulsos y resuelve retos de Scratch.',color:'#91f4da',fondo:'#143f52'},
  {id:'robot',titulo:'Código Roto',tipo:'Lógica',detalle:'Ordena instrucciones para guiar al robot por ocho misiones.',color:'#b4cbff',fondo:'#243966'},
  {id:'circuito',titulo:'Guardianes del Circuito',tipo:'Rompecabezas',detalle:'Gira piezas y conecta ocho reactores.',color:'#fcd98c',fondo:'#4f315b'},
