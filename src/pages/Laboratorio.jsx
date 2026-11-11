@@ -11,6 +11,7 @@ import Insignias from '../components/Insignias'
 import CodigoRoto from '../components/CodigoRoto'
 import Circuitos from '../components/Circuitos'
 
+const CircuitoTurbo = lazy(() => import('../components/CircuitoTurbo'))
 const Nucita = lazy(() => import('../components/Nucita'))
 const ArenaScratch3D = lazy(() => import('../components/ArenaScratch3D'))
 
@@ -24,6 +25,7 @@ export default function Laboratorio({ user, onLogout }) {
   const [loading, setLoading]           = useState(true)
   const [modalInvento, setModalInvento] = useState(null)
   const [enConstructor, setEnConstructor] = useState(false)
+  const [enTurbo,setEnTurbo]=useState(false)
   const [enNucita, setEnNucita] = useState(false)
   const [enArena, setEnArena] = useState(false)
   const [enCircuitos, setEnCircuitos] = useState(false)
@@ -111,7 +113,7 @@ export default function Laboratorio({ user, onLogout }) {
         </header>
 
         <GaleriaDesafios abrir={{
-          nucita:()=>setEnNucita(true), islas:()=>setEnArena(true),
+          turbo:()=>setEnTurbo(true), nucita:()=>setEnNucita(true), islas:()=>setEnArena(true),
           robot:()=>setEnCodigoRoto(true), circuito:()=>setEnCircuitos(true),
           espacio:()=>setEnMinijuego(true),
         }} />
@@ -158,6 +160,7 @@ export default function Laboratorio({ user, onLogout }) {
 
         {estudiante?.nivel === 3 && <MundosNivel3 misiones={misiones} progreso={progreso} inventos={inventos} onJugar={() => setEnTaller(true)} onSubir={misionId => setModalInvento({ misionId })} />}
 
+        {enTurbo && <Suspense fallback={<div className="game-overlay"><p>Cargando Circuito Turbo…</p><button className="btn-ghost" onClick={()=>setEnTurbo(false)}>Cerrar</button></div>}><CircuitoTurbo estudianteId={user.id} onCerrar={()=>setEnTurbo(false)} /></Suspense>}
         {enNucita && <Suspense fallback={<div className="game-overlay"><p>Abriendo el cuento de Nucita…</p><button className="btn-ghost" onClick={()=>setEnNucita(false)}>Cerrar</button></div>}><Nucita estudianteId={user.id} onCerrar={()=>setEnNucita(false)} /></Suspense>}
         {enArena && <Suspense fallback={<div className="game-overlay"><p>Cargando Islas del Código 3D…</p><button className="btn-ghost" onClick={()=>setEnArena(false)}>Cerrar</button></div>}><ArenaScratch3D estudianteId={user.id} onCerrar={()=>setEnArena(false)} /></Suspense>}
         {enCircuitos && <Circuitos estudianteId={user.id} onCerrar={()=>setEnCircuitos(false)} />}
