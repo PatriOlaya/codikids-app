@@ -1,0 +1,15 @@
+.turbo-overlay{background:radial-gradient(ellipse at top,#303b5d,#101424 65%);color:#f5f8ff}
+.turbo-pistas,.turbo-programa{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:12px 0}
+.turbo-pistas button,.turbo-vistas button,.turbo-controles button{border:1px solid #8496bf;background:#222e4d;color:#fff;border-radius:10px;min-height:42px;padding:7px 11px;font-weight:700;cursor:pointer}
+.turbo-pistas button small{display:block;font-weight:400;color:#d9e2f6;font-size:.75rem;margin-top:.2rem}
+.turbo-pistas button[aria-pressed=true],.turbo-vistas button[aria-pressed=true]{border-color:#80f4d8;background:#19605f}
+.turbo-vistas,.turbo-controles,.turbo-hud{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:10px 0}
+.turbo-hud{background:#202e4c;padding:10px 12px;border-radius:12px;gap:12px;font-size:.85rem}
+.turbo-aviso{color:#ffda9c}.turbo-stage{position:relative;overflow:hidden;border-radius:15px;border:1px solid #617aa7}.turbo-canvas{height:clamp(235px,46vh,485px);background:#303e5c}.turbo-canvas canvas{display:block;width:100%;height:100%}
+.turbo-capa{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;text-align:center;background:#11172ddd;padding:15px}
+.turbo-tablero{position:absolute;bottom:0;left:18%;right:18%;border:4px solid #4b637e;border-bottom:0;border-radius:65% 65% 0 0;padding:9px;text-align:center;background:#152237;color:#a4ffee;pointer-events:none;font-size:.78rem}
+.turbo-tablero span{margin:0 8px;font-weight:800}.turbo-controles button{touch-action:none;user-select:none;flex:1}
+.turbo-panel{margin-top:12px;background:#202a42;border:1px solid #586c92;border-radius:14px;padding:13px}.turbo-panel h3{margin:0}.turbo-panel p{line-height:1.45}.turbo-programa label{font-size:.82rem;font-weight:700}
+.turbo-panel select{display:block;width:100%;border-radius:8px;padding:.55rem;background:#101c34;color:white;border:1px solid #7895bd;margin-top:.3rem}.turbo-vistas label{font-size:.78rem}.turbo-overlay button:focus-visible{outline:2px solid #b4ffeb;outline-offset:2px}
+@media(max-width:650px){.turbo-pistas,.turbo-programa{grid-template-columns:repeat(2,minmax(0,1fr))}.turbo-controles button{font-size:.8rem;padding:5px}.turbo-hud{gap:8px}}
+.turbo-inicio{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);white-space:nowrap;box-shadow:0 3px 16px #101429af}.turbo-controles button:disabled{opacity:.55}
