@@ -27,3 +27,4 @@
 @keyframes nucita-bob{50%{transform:translateY(-4px)}}@keyframes nucita-twinkle{50%{opacity:.32}}
 @media(max-width:620px){.nucita-content{grid-template-columns:1fr}.nucita-coneja{height:65%;width:36%;left:5%}.nucita-punto{font-size:.77rem;padding:.55rem .6rem}.nucita-hoja{left:78%}.nucita-escena{min-height:235px}}
 @media(prefers-reduced-motion:reduce){.nucita-coneja,.nucita-luciernaga,.nucita-brillo{animation:none}}
+.nucita-ruta-bloques{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}.nucita-ruta-bloques select{font:inherit;color:#27233b;background:#fff7eb;border:1px solid #694f70;border-radius:8px;padding:.4rem;max-width:100%}.nucita-editor>.nucita-actions+.nucita-actions{margin-top:10px}
