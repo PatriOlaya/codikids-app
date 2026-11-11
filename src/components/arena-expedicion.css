@@ -1,0 +1,5 @@
+.arena-scan-reticle[data-lector=listo]{border-color:#78ffc7;box-shadow:0 0 0 2px #0c4338,0 0 20px #78ffc7}
+.arena-scan-screen[data-lector=listo]{color:#b9ffde;border-color:#78ffc7}
+.arena-scan-reticle[data-lector=cerrado],.arena-scan-screen[data-lector=cerrado]{border-color:#ffbd76}
+.arena-alerta{position:absolute;top:12px;left:50%;transform:translateX(-50%);max-width:92%;padding:8px 13px;border-radius:12px;color:#ffefcf;background:#582c28;border:1px solid #ffc48c;text-align:center;font-size:clamp(.75rem,2vw,.95rem);font-weight:800;pointer-events:none}
+.arena-controls button[data-escudo=activo]{background:#175e5b;border-color:#8effda}
