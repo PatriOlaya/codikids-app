@@ -34,3 +34,8 @@ export const PREGUNTAS = [
 export function preguntaPara(indice, ronda){const q=PREGUNTAS[(ronda*6+indice)%PREGUNTAS.length];const opciones=q.slice(1,4).map((texto,i)=>({texto,correcta:i===0}));const shift=(indice+ronda)%3;return {texto:q[0],explicacion:q[4],opciones:[...opciones.slice(shift),...opciones.slice(0,shift)]}}
 export function premiar(estado,correcta){return correcta?{...estado,puntos:estado.puntos+100,vidas:Math.min(5,estado.vidas+1),aciertos:estado.aciertos+1}:{...estado,vidas:Math.max(0,estado.vidas-1)}}
 export function plataformasPara(ronda){return Array.from({length:9},(_,i)=>({x:i===0?0:(i%2?1:-1)*(ronda>=1?2:1.5),z:-i*5.1,y:i===0?0:(i%3)*.35,w:i===0?7:ronda>=1?3.5:4.5,d:i===0?6:3.8}))}
+
+// El pedestal ocupa espacio en la isla; el robot puede rodearlo.
+export function chocaConBlanco(x,y,z,blanco,r=.98){
+ return y < blanco.y+1 && y+2.1 > blanco.y-2.65 && Math.hypot(x-blanco.x,z-blanco.z)<r
+}
