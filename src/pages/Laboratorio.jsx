@@ -1,3 +1,4 @@
+import GaleriaDesafios from '../components/GaleriaDesafios'
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import Planeta from '../components/Planeta'
@@ -109,6 +110,12 @@ export default function Laboratorio({ user, onLogout }) {
           <button className="btn-ghost" onClick={onLogout} style={{ padding: '.5rem 1rem', fontSize: '.85rem' }}>Salir</button>
         </header>
 
+        <GaleriaDesafios abrir={{
+          nucita:()=>setEnNucita(true), islas:()=>setEnArena(true),
+          robot:()=>setEnCodigoRoto(true), circuito:()=>setEnCircuitos(true),
+          espacio:()=>setEnMinijuego(true),
+        }} />
+
         {estudiante?.nivel !== 3 && <>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
           <div className="card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
@@ -151,11 +158,6 @@ export default function Laboratorio({ user, onLogout }) {
 
         {estudiante?.nivel === 3 && <MundosNivel3 misiones={misiones} progreso={progreso} inventos={inventos} onJugar={() => setEnTaller(true)} onSubir={misionId => setModalInvento({ misionId })} />}
 
-        <section className="card" style={{marginBottom:'1.5rem',background:'linear-gradient(130deg,#233758,#342451)'}}>
-          <h2 style={{fontSize:'1.2rem'}}>🎮 Central de desafíos</h2>
-          <p style={{color:'#cfdbec',lineHeight:1.6}}>Supera operaciones de lógica, conecta reactores y pilota entre tormentas espaciales. Cada etapa añade una regla nueva.</p>
-          <div className="game-actions"><button onClick={()=>setEnNucita(true)}>🐰 Nucita: el misterio del parque · Nuevo</button><button onClick={()=>setEnArena(true)}>🎯 Islas del Código · 3D</button><button onClick={()=>setEnCodigoRoto(true)}>🤖 Código Roto · 8 operaciones</button><button onClick={()=>setEnCircuitos(true)}>⚡ Guardianes del Circuito</button><button onClick={()=>setEnMinijuego(true)}>🚀 Expedición espacial · 4 sectores</button></div>
-        </section>
         {enNucita && <Suspense fallback={<div className="game-overlay"><p>Abriendo el cuento de Nucita…</p><button className="btn-ghost" onClick={()=>setEnNucita(false)}>Cerrar</button></div>}><Nucita estudianteId={user.id} onCerrar={()=>setEnNucita(false)} /></Suspense>}
         {enArena && <Suspense fallback={<div className="game-overlay"><p>Cargando Islas del Código 3D…</p><button className="btn-ghost" onClick={()=>setEnArena(false)}>Cerrar</button></div>}><ArenaScratch3D estudianteId={user.id} onCerrar={()=>setEnArena(false)} /></Suspense>}
         {enCircuitos && <Circuitos estudianteId={user.id} onCerrar={()=>setEnCircuitos(false)} />}
