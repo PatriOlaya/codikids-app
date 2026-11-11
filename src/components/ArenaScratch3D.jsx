@@ -1,34 +1,35 @@
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js'
-import { ARENAS, plataformasPara, preguntaPara, premiar, chocaConBlanco } from '../games/arena'
+import { ARENAS, plataformasPara, preguntaPara, premiar, chocaConBlanco, estadoLector, recibirPulso, ESCUDO_DURACION, ESCUDO_RECARGA, PULSO_AVISO } from '../games/arena'
+import { decorarArena } from '../games/arenaPaisaje'
+import './arena-expedicion.css'
 const COLORES=[{nombre:'Explorador turquesa',color:0x37bdb1},{nombre:'Inventora violeta',color:0x9471df},{nombre:'Piloto naranja',color:0xf69b48}]
 const inicial=()=>({puntos:0,vidas:5,aciertos:0})
 export default function ArenaScratch3D({estudianteId,onCerrar}){
  const key=`codikids-arena3d-v1-${estudianteId}`
  const [mira,setMira]=useState(false)
+ const [lector,setLector]=useState('buscando'),[defensa,setDefensa]=useState('listo'),[alerta,setAlerta]=useState(false)
  const [records,setRecords]=useState(()=>{try{return JSON.parse(localStorage.getItem(key))||{}}catch{return {}}})
  const [ronda,setRonda]=useState(0),[avatar,setAvatar]=useState(0),[hud,setHud]=useState(inicial),[pregunta,setPregunta]=useState(null),[respuesta,setRespuesta]=useState(null),[pausa,setPausa]=useState(false),[error,setError]=useState(''),[aviso,setAviso]=useState('Salta a la siguiente isla, acércate al blanco y pulsa Apuntar.'),[final,setFinal]=useState(false),[sesion,setSesion]=useState(0)
  const host=useRef(null),engine=useRef(null),keys=useRef({}),blocked=useRef(false),aiming=useRef(false),callbacks=useRef({})
- callbacks.current={quiz(q){aiming.current=false;setMira(false);setPregunta(q);setRespuesta(null)},hud:setHud,aviso:setAviso}
+ callbacks.current={quiz(q){aiming.current=false;setMira(false);setPregunta(q);setRespuesta(null)},hud:setHud,aviso:setAviso,lector:setLector,defensa:setDefensa,alerta:setAlerta}
  useEffect(()=>{blocked.current=pausa||!!pregunta||final},[pausa,pregunta,final])
  useEffect(()=>{
   const mount=host.current;if(!mount)return
   let renderer,raf,quizTimer,disposed=false;const theme=ARENAS[ronda]
   try{renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'})}catch{setError('Este dispositivo no pudo iniciar los gráficos 3D. Prueba Chrome o Edge con aceleración gráfica activada.');return}
-  setError('');renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;mount.appendChild(renderer.domElement)
+  setError('');renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.6));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;mount.appendChild(renderer.domElement)
   const scene=new THREE.Scene();scene.background=new THREE.Color(theme.cielo);scene.fog=new THREE.Fog(theme.cielo,22,65)
   const camera=new THREE.PerspectiveCamera(55,1,.1,130);camera.position.set(0,7,10)
   scene.add(new THREE.HemisphereLight(0xeef8ff,0x758299,2.3));const sun=new THREE.DirectionalLight(0xfff2d6,3);sun.position.set(8,18,8);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);sun.shadow.camera.left=-15;sun.shadow.camera.right=15;sun.shadow.camera.top=20;sun.shadow.camera.bottom=-45;sun.shadow.camera.far=80;scene.add(sun)
-  const materials=[],geometries=[]
+  const materials=[],geometries=[],textures=[]
   function mat(color,extra={}){const m=new THREE.MeshStandardMaterial({color,roughness:.72,...extra});materials.push(m);return m}
   function box(w,h,d,material,x,y,z,parent=scene,rounded=false){const geo=rounded?new RoundedBoxGeometry(w,h,d,2,.07):new THREE.BoxGeometry(w,h,d);geometries.push(geo);const mesh=new THREE.Mesh(geo,material);mesh.position.set(x,y,z);mesh.castShadow=true;mesh.receiveShadow=true;parent.add(mesh);return mesh}
   const rock=mat(0x6f7f9c),grass=mat(theme.color),white=mat(0xf2f4f4),navy=mat(0x213653),shirt=mat(COLORES[avatar].color),gold=mat(0xffd075,{metalness:.3,roughness:.3})
   const platforms=plataformasPara(ronda)
   platforms.forEach((p,i)=>{box(p.w,1.5,p.d,rock,p.x,p.y-.75,p.z);box(p.w+.05,.18,p.d+.05,grass,p.x,p.y+.03,p.z);if(i>0){box(.14,1.8,.14,gold,p.x-p.w/2+.2,p.y+.9,p.z-.9);box(.9,.5,.08,white,p.x-p.w/2+.55,p.y+1.5,p.z-.9)}})
-  // Arquitectura flotante al fondo, lejos del recorrido.
-  const deco=mat(0xcad9e8)
-  for(let i=0;i<18;i++){const side=i%2?1:-1;box(3,3+i%5*2,3,deco,side*(11+i%3*4),-4,-i*5);box(3.1,.3,3.1,grass,side*(11+i%3*4),-2.4+(i%5),-i*5)}
+  const beacon=decorarArena({scene,ronda,platforms,mat,box,geometries,materials,textures})
   const player=new THREE.Group();scene.add(player)
   const visor=mat(0x0e2740,{metalness:.4,roughness:.25}), glow=mat(0x69fff3,{emissive:0x2de6d4,emissiveIntensity:1.4})
   const rounded=(w,h,d,m,x,y,z,parent=player)=>box(w,h,d,m,x,y,z,parent,true)
@@ -60,27 +61,44 @@ export default function ArenaScratch3D({estudianteId,onCerrar}){
   rounded(.29,2.3,.29,navy,0,1.22,0,pedestal)
   rounded(.11,1.8,.05,glow,0,1.2,.16,pedestal)
   const shieldGeo=new THREE.SphereGeometry(.86,20,16);geometries.push(shieldGeo);const shieldMat=mat(0x67d8ff,{transparent:true,opacity:.32,metalness:.4});const shield=new THREE.Mesh(shieldGeo,shieldMat);target.add(shield)
+  const drone=new THREE.Group();scene.add(drone);drone.visible=ronda>0
+  const pulsoMat=mat(0xff9c6a,{emissive:0xff541b,emissiveIntensity:1.05})
+  rounded(.78,.35,.54,navy,0,0,0,drone);rounded(.49,.16,.10,pulsoMat,0,0,.28,drone)
+  for(const lado of [-1,1])rounded(.28,.19,.42,white,lado*.50,0,0,drone)
+  const bolaGeo=new THREE.SphereGeometry(.24,12,10);geometries.push(bolaGeo)
+  const pulso=new THREE.Mesh(bolaGeo,pulsoMat);pulso.visible=false;scene.add(pulso)
+  const escudoRobot=new THREE.Mesh(shieldGeo,shieldMat);escudoRobot.scale.set(1.13,1.65,1.13);escudoRobot.visible=false;scene.add(escudoRobot)
+  const destinoPulso=new THREE.Vector3(),velocidadPulso=new THREE.Vector3()
+  let proximoPulso=3.2,avisoPulso=0,proximoEscudo=0,protegidoHasta=0,ultimaLectura=0,ultimoEstado=''
+  setDefensa('listo');setAlerta(false);setLector('buscando')
   const checkpoint=new THREE.Vector3(0,.13,0), pos=new THREE.Vector3(0,.13,0);let vy=0,onGround=true,jumpHeld=false,time=0,last=0,questionCount=0,targetOpen=true,stage=inicial()
   const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();let yaw=0,pitch=0,drag=null;const focus=new THREE.Vector3(),desired=new THREE.Vector3()
   function resetPosition(){pos.copy(checkpoint);vy=0;onGround=true}
-  function updateTarget(){const p=platforms[Math.min(stage.aciertos+1,8)];target.position.set(p.x,p.y+2.6,p.z-.6);pedestal.position.set(p.x,p.y,p.z-.6)}
+  function updateTarget(){const p=platforms[Math.min(stage.aciertos+1,8)];target.position.set(p.x,p.y+2.6,p.z-.6);pedestal.position.set(p.x,p.y,p.z-.6);beacon.position.set(p.x,p.y+3.65,p.z-.6)}
   updateTarget();setHud(stage);setFinal(false);blocked.current=false
-  engine.current={respond(correct){stage=premiar(stage,correct);if(correct){const p=platforms[Math.min(stage.aciertos,8)];checkpoint.set(p.x,p.y+.14,p.z+.8);updateTarget()}callbacks.current.hud({...stage});return {...stage}},reset:resetPosition,aim(active){
+  engine.current={respond(correct){stage=premiar(stage,correct);if(correct){pulso.visible=false;avisoPulso=0;proximoPulso=time+2.5;callbacks.current.alerta(false);const p=platforms[Math.min(stage.aciertos,8)];checkpoint.set(p.x,p.y+.14,p.z+.8);updateTarget()}callbacks.current.hud({...stage});return {...stage}},reset:resetPosition,aim(active){
    aiming.current=active;camera.fov=active?47:55;camera.updateProjectionMatrix()
    if(active){const d=target.position.clone().sub(pos).sub(new THREE.Vector3(0,1.86,0));yaw=Math.atan2(d.x,-d.z);pitch=Math.atan2(d.y,Math.hypot(d.x,d.z));keys.current={}}
-  },scan:()=>shoot()}
+  },scan:()=>shoot(),shield:activarEscudo}
+  function activarEscudo(){
+   if(ronda===0||blocked.current||time<proximoEscudo)return
+   protegidoHasta=time+ESCUDO_DURACION;proximoEscudo=time+ESCUDO_RECARGA
+   callbacks.current.defensa('activo')
+  }
   function enfocar(){
    camera.position.set(pos.x,pos.y+1.86,pos.z)
    focus.set(Math.sin(yaw)*Math.cos(pitch),Math.sin(pitch),-Math.cos(yaw)*Math.cos(pitch)).add(camera.position)
    camera.lookAt(focus)
   }
+  function leerBlanco(){
+   pointer.set(0,0);enfocar();camera.updateMatrixWorld();target.updateMatrixWorld(true);raycaster.setFromCamera(pointer,camera)
+   return estadoLector({distancia:pos.distanceTo(target.position),centrado:raycaster.intersectObjects(target.children.filter(m=>m!==shield),false).length>0,abierto:targetOpen})
+  }
   function shoot(){
    if(blocked.current||disposed)return
    if(!aiming.current){callbacks.current.aviso('Activa Apuntar para ver la retícula del lector.');return}
-   pointer.set(0,0);enfocar();camera.updateMatrixWorld();target.updateMatrixWorld(true);raycaster.setFromCamera(pointer,camera)
-   if(!raycaster.intersectObjects(target.children.filter(m=>m!==shield),false).length){callbacks.current.aviso('Apunta al círculo del blanco.');return}
-   if(pos.distanceTo(target.position)>8){callbacks.current.aviso('Está lejos. Avanza saltando hasta la siguiente isla.');return}
-   if(!targetOpen){callbacks.current.aviso('El escudo está cerrado. Espera hasta que se apague.');return}
+   const estado=leerBlanco()
+   if(estado!=='listo'){callbacks.current.aviso({lejos:'Acércate al blanco en la siguiente isla.',buscando:'Centra el círculo del blanco en la retícula.',cerrado:'Espera a que se abra el escudo del blanco.'}[estado]);return}
    blocked.current=true;questionCount++
    const beamGeo=new THREE.BufferGeometry().setFromPoints([pos.clone().add(new THREE.Vector3(.5,1.2,0)),target.position.clone()]);geometries.push(beamGeo)
    const beamMat=new THREE.LineBasicMaterial({color:0xffed97});materials.push(beamMat);const beam=new THREE.Line(beamGeo,beamMat);scene.add(beam)
@@ -94,7 +112,7 @@ export default function ArenaScratch3D({estudianteId,onCerrar}){
   const pointerCancel=()=>{drag=null}
   canvas.addEventListener('pointerdown',pointerDown);canvas.addEventListener('pointermove',pointerMove);canvas.addEventListener('pointerup',pointerUp);canvas.addEventListener('pointercancel',pointerCancel)
 
-  const down=e=>{if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','KeyW','KeyA','KeyS','KeyD'].includes(e.code)){if(!blocked.current){e.preventDefault();if(aiming.current&&e.code==='Space'&&!e.repeat)shoot();else keys.current[e.code]=true}}}
+  const down=e=>{if(e.code==='KeyE'&&!e.repeat){activarEscudo();return}if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','KeyW','KeyA','KeyS','KeyD'].includes(e.code)){if(!blocked.current){e.preventDefault();if(aiming.current&&e.code==='Space'&&!e.repeat)shoot();else keys.current[e.code]=true}}}
   const up=e=>{keys.current[e.code]=false};const blur=()=>{keys.current={}}
   window.addEventListener('keydown',down);window.addEventListener('keyup',up);window.addEventListener('blur',blur)
   function resize(){const width=mount.clientWidth||800,height=mount.clientHeight||460;renderer.setSize(width,height);camera.aspect=width/height;camera.updateProjectionMatrix()}
@@ -113,10 +131,35 @@ export default function ArenaScratch3D({estudianteId,onCerrar}){
     }
     const jumping=!aiming.current&&!!(k.Space||k.jump);if(jumping&&!jumpHeld&&onGround){vy=8.5;onGround=false}jumpHeld=jumping;const oldY=pos.y;vy-=22*dt;pos.y+=vy*dt;onGround=false
     for(const p of platforms){const top=p.y+.14;if(vy<=0&&oldY>=top-.04&&pos.y<=top&&Math.abs(pos.x-p.x)<p.w/2+.1&&Math.abs(pos.z-p.z)<p.d/2+.1){pos.y=top;vy=0;onGround=true;break}}
-    if(pos.y < -6){stage={...stage,vidas:Math.max(0,stage.vidas-1)};resetPosition();callbacks.current.hud({...stage});callbacks.current.aviso('Caíste. Vuelve a intentarlo desde tu última isla conquistada.');if(!stage.vidas){blocked.current=true;callbacks.current.quiz({fin:true})}}
+    if(pos.y < -6){stage={...stage,vidas:Math.max(0,stage.vidas-1)};resetPosition();callbacks.current.hud({...stage});pulso.visible=false;avisoPulso=0;proximoPulso=time+2.5;callbacks.current.alerta(false);callbacks.current.aviso('Caíste. Vuelve a intentarlo desde tu última isla conquistada.');if(!stage.vidas){blocked.current=true;callbacks.current.quiz({fin:true})}}
     if(!aiming.current&&(dx||dz))player.rotation.y=Math.atan2(-dx,-dz);const walking=!aiming.current&&onGround&&(dx||dz);legs.forEach((m,i)=>{m.rotation.x=walking?Math.sin(time*12+i*Math.PI)*.5:0});arms.forEach((m,i)=>{m.rotation.x=walking?-Math.sin(time*12+i*Math.PI)*.3:0})
     updateTarget();if(ronda===1||ronda===3)target.position.x+=Math.sin(time*1.8)*1.1
     targetOpen=ronda<2||time%4<2.3;shield.visible=!targetOpen
+    beacon.visible=!aiming.current
+    if(ronda>0){
+     drone.position.set(target.position.x+Math.sin(time*1.05)*1.5,target.position.y+.65+Math.sin(time*2)*.22,target.position.z-.85)
+     const cerca=pos.distanceTo(drone.position)<9
+     if(!pulso.visible&&cerca&&time>=proximoPulso&&!avisoPulso){
+      avisoPulso=time+PULSO_AVISO;destinoPulso.set(pos.x,pos.y+1,pos.z);callbacks.current.alerta(true)
+     }
+     if(avisoPulso&&time>=avisoPulso){
+      avisoPulso=0;callbacks.current.alerta(false);pulso.position.copy(drone.position)
+      velocidadPulso.copy(destinoPulso).sub(pulso.position).normalize().multiplyScalar(4.8+ronda*.7);pulso.visible=true;proximoPulso=time+3.6
+     }
+     if(pulso.visible){
+      pulso.position.addScaledVector(velocidadPulso,dt)
+      if(pulso.position.distanceToSquared(focus.set(pos.x,pos.y+1,pos.z))<.75*.75){
+       pulso.visible=false;const vidas=recibirPulso(stage.vidas,protegidoHasta,time)
+       if(vidas!==stage.vidas){stage={...stage,vidas};callbacks.current.hud({...stage});callbacks.current.aviso('El pulso del guardián te quitó una vida. Esquívalo o activa el escudo.');if(!vidas){blocked.current=true;callbacks.current.quiz({fin:true})}}
+       else callbacks.current.aviso('¡Tu escudo bloqueó el pulso!')
+      }else if(pulso.position.distanceToSquared(drone.position)>15*15)pulso.visible=false
+     }
+     const actual=time<protegidoHasta?'activo':time<proximoEscudo?'recarga':'listo'
+     if(actual!==ultimoEstado){ultimoEstado=actual;callbacks.current.defensa(actual)}
+     escudoRobot.visible=actual==='activo'&&!aiming.current;escudoRobot.position.set(pos.x,pos.y+1.1,pos.z)
+    }
+    if(aiming.current&&time-ultimaLectura>.085){ultimaLectura=time;callbacks.current.lector(leerBlanco())}
+
    }
    player.position.copy(pos)
    player.visible=!aiming.current
@@ -130,18 +173,18 @@ export default function ArenaScratch3D({estudianteId,onCerrar}){
    renderer.render(scene,camera)
   }
   raf=requestAnimationFrame(loop)
-  return()=>{disposed=true;clearTimeout(quizTimer);cancelAnimationFrame(raf);observer.disconnect();canvas.removeEventListener('pointerdown',pointerDown);canvas.removeEventListener('pointermove',pointerMove);canvas.removeEventListener('pointerup',pointerUp);canvas.removeEventListener('pointercancel',pointerCancel);window.removeEventListener('keydown',down);window.removeEventListener('keyup',up);window.removeEventListener('blur',blur);keys.current={};materials.forEach(m=>m.dispose());geometries.forEach(g=>g.dispose());renderer.dispose();renderer.domElement.remove();engine.current=null}
+  return()=>{disposed=true;clearTimeout(quizTimer);cancelAnimationFrame(raf);observer.disconnect();canvas.removeEventListener('pointerdown',pointerDown);canvas.removeEventListener('pointermove',pointerMove);canvas.removeEventListener('pointerup',pointerUp);canvas.removeEventListener('pointercancel',pointerCancel);window.removeEventListener('keydown',down);window.removeEventListener('keyup',up);window.removeEventListener('blur',blur);keys.current={};materials.forEach(m=>m.dispose());geometries.forEach(g=>g.dispose());textures.forEach(t=>t.dispose());sun.shadow.map?.dispose();renderer.dispose();renderer.domElement.remove();engine.current=null}
  },[ronda,avatar,sesion])
  function responder(i){if(respuesta!==null)return;const correct=pregunta.opciones[i].correcta;setRespuesta(i);const state=engine.current.respond(correct);if(correct&&state.aciertos>=ARENAS[ronda].objetivo){const next={...records,[ronda]:Math.max(records[ronda]||0,state.puntos)};setRecords(next);try{localStorage.setItem(key,JSON.stringify(next))}catch{}}}
  function continuar(){const win=hud.aciertos>=ARENAS[ronda].objetivo;if(win||hud.vidas<=0)setFinal(true);setPregunta(null);setRespuesta(null);keys.current={}}
- function cambiarMira(){if(!engine.current||pregunta||final||pausa)return;const next=!mira;engine.current.aim(next);setMira(next);setAviso(next?'Centra el blanco en la retícula y pulsa Escanear.':'Avanza y salta para acercarte al siguiente blanco.') }
+ function cambiarMira(){if(!engine.current||pregunta||final||pausa)return;const next=!mira;engine.current.aim(next);setMira(next);setLector('buscando');setAviso(next?'Centra el blanco en la retícula y pulsa Escanear.':'Avanza y salta para acercarte al siguiente blanco.') }
  function reiniciar(i=ronda){aiming.current=false;setMira(false);setRonda(i);setSesion(n=>n+1);setPregunta(null);setRespuesta(null);setFinal(false);setPausa(false);setAviso(ARENAS[i].descripcion)}
  const control=(code,label)=><button type="button" aria-label={label} onPointerDown={e=>{e.preventDefault();e.currentTarget.setPointerCapture(e.pointerId);keys.current[code]=true}} onPointerUp={()=>{keys.current[code]=false}} onPointerCancel={()=>{keys.current[code]=false}}>{label}</button>
  return <div className="game-overlay arena-overlay"><div className="game-shell"><header className="game-header"><div><small>PLATAFORMAS 3D + PROGRAMACIÓN</small><h2>🎯 Islas del Código</h2></div><button className="btn-ghost" onClick={onCerrar}>Cerrar ✕</button></header><nav className="game-tabs" aria-label="Arenas">{ARENAS.map((a,i)=><button key={a.nombre} disabled={i>0&&records[i-1]===undefined} aria-current={ronda===i?'step':undefined} onClick={()=>reiniciar(i)}>{records[i]?'✓':i+1} {a.nombre}</button>)}</nav>
  <div className="arena-hud"><strong>{ARENAS[ronda].nombre}</strong><span>♥ {hud.vidas}/5</span><span>★ {hud.puntos}</span><span>🎯 {hud.aciertos}/{ARENAS[ronda].objetivo}</span><button onClick={()=>setPausa(p=>!p)}>{pausa?'▶ Seguir':'⏸ Pausa'}</button></div>
- <div className="arena-stage"><div ref={host} className="arena-canvas" aria-label="Arena tridimensional de plataformas; acércate al blanco y usa el lector de energía"/>{mira&&!pregunta&&!final&&!pausa&&<div className="arena-scan-view" aria-hidden="true"><span className="arena-scan-reticle"/><span className="arena-scan-screen">LECTOR DE ENERGÍA</span></div>}{error&&<div className="arena-modal"><p>{error}</p></div>}{pausa&&!pregunta&&!final&&<div className="arena-modal"><h2>En pausa</h2><button className="btn-primary" onClick={()=>setPausa(false)}>Continuar</button></div>}
+ <div className="arena-stage"><div ref={host} className="arena-canvas" aria-label="Arena tridimensional de plataformas; acércate al blanco y usa el lector de energía"/>{mira&&!pregunta&&!final&&!pausa&&<div className="arena-scan-view" aria-hidden="true"><span className="arena-scan-reticle" data-lector={lector}/><span className="arena-scan-screen" data-lector={lector}>{({listo:"✓ LISTO PARA ESCANEAR",lejos:"ACÉRCATE AL BLANCO",buscando:"CENTRA EL BLANCO",cerrado:"ESCUDO DEL BLANCO CERRADO"})[lector]}</span></div>}{alerta&&!pregunta&&!pausa&&!final&&<div className="arena-alerta" role="status">⚠ Pulso en camino · esquiva o activa el escudo</div>}{error&&<div className="arena-modal"><p>{error}</p></div>}{pausa&&!pregunta&&!final&&<div className="arena-modal"><h2>En pausa</h2><button className="btn-primary" onClick={()=>setPausa(false)}>Continuar</button></div>}
  {pregunta&&<div className="arena-modal"><section className="arena-question" role="dialog" aria-modal="true" aria-label="Pregunta de Scratch">{pregunta.fin?<><h2>Sin vidas</h2><p>Puedes volver a intentarlo desde el inicio de esta arena.</p><button className="btn-primary" onClick={()=>reiniciar()}>Intentar otra vez</button></>:<><small>BLANCO ALCANZADO · PIENSA Y RESPONDE</small><h3>{pregunta.texto}</h3>{pregunta.opciones.map((o,i)=><button key={o.texto} disabled={respuesta!==null} onClick={()=>responder(i)} style={{borderColor:respuesta!==null&&o.correcta?'#6ff4bf':respuesta===i?'#ff8798':undefined}}>{o.texto}</button>)}{respuesta!==null&&<><p role="status">{pregunta.opciones[respuesta].correcta?'✓ +100 puntos y recuperas una vida.':'Aún no. Pierdes una vida; puedes seguir practicando.'} {pregunta.explicacion}</p><button className="btn-primary" onClick={continuar}>Continuar →</button></>}</>}</section></div>}
  {final&&<div className="arena-modal"><section className="arena-question"><h2>{hud.vidas>0?'¡Arena conquistada!':'¡Vamos de nuevo!'}</h2><p>{hud.puntos} puntos · {hud.aciertos} preguntas resueltas</p><button onClick={()=>reiniciar()}>Repetir arena</button>{hud.vidas>0&&ronda<3&&<button onClick={()=>reiniciar(ronda+1)}>Siguiente arena →</button>}</section></div>}</div>
- <div className="arena-controls"><div>{control('left','←')}{control('forward','↑')}{control('back','↓')}{control('right','→')}</div><div>{!mira&&control('jump','Saltar')}<button type="button" aria-pressed={mira} onClick={cambiarMira} disabled={!!error}>{mira?'Salir de mira':'Apuntar'}</button>{mira&&<button type="button" onClick={()=>engine.current?.scan()}>Escanear</button>}</div></div><p className="game-feedback" role="status">{aviso}</p><p className="game-muted">Usa flechas o WASD para caminar y espacio para saltar. Pulsa Apuntar para mirar desde el robot. Ajusta la retícula arrastrando sobre la pantalla o con las flechas. Pulsa Escanear o espacio cuando el blanco esté centrado. Acierto: +100 puntos y +1 vida; error o caída: −1 vida. La siguiente arena se abre al completar las preguntas.</p><label className="game-muted">Personaje (cambiarlo reinicia esta arena): <select value={avatar} onChange={e=>{aiming.current=false;setMira(false);setPregunta(null);setFinal(false);setPausa(false);setAvatar(Number(e.target.value))}}>{COLORES.map((c,i)=><option key={c.nombre} value={i}>{c.nombre}</option>)}</select></label><p className="game-muted">Récords por usuario en este navegador. Los puntos de esta arena son independientes de tus XP y certificados.</p>
+ <div className="arena-controls"><div>{control('left','←')}{control('forward','↑')}{control('back','↓')}{control('right','→')}</div><div>{!mira&&control('jump','Saltar')}<button type="button" aria-pressed={mira} onClick={cambiarMira} disabled={!!error}>{mira?'Salir de mira':'Apuntar'}</button>{mira&&<button type="button" onClick={()=>engine.current?.scan()}>Escanear</button>}{ronda>0&&<button type="button" data-escudo={defensa} disabled={defensa!=='listo'||pausa||!!pregunta||final} onClick={()=>engine.current?.shield()}>{({listo:'🛡 Escudo',activo:'🛡 Activo',recarga:'↻ Recargando'})[defensa]}</button>}</div></div><p className="game-feedback" role="status">{aviso}</p><p className="game-muted">Usa flechas o WASD para caminar y espacio para saltar. Pulsa Apuntar para mirar desde el robot. Ajusta la retícula arrastrando sobre la pantalla o con las flechas. Pulsa Escanear o espacio cuando el blanco esté centrado. Desde la segunda arena, esquiva los pulsos del guardián o activa el escudo con E o su botón. Acierto: +100 puntos y +1 vida; error o caída: −1 vida. La siguiente arena se abre al completar las preguntas.</p><label className="game-muted">Personaje (cambiarlo reinicia esta arena): <select value={avatar} onChange={e=>{aiming.current=false;setMira(false);setPregunta(null);setFinal(false);setPausa(false);setAvatar(Number(e.target.value))}}>{COLORES.map((c,i)=><option key={c.nombre} value={i}>{c.nombre}</option>)}</select></label><p className="game-muted">Récords por usuario en este navegador. Los puntos de esta arena son independientes de tus XP y certificados.</p>
  </div></div>
 }

@@ -13,3 +13,19 @@ test('El pedestal bloquea el paso a nivel de la isla y deja espacio para rodearl
  assert.equal(chocaConBlanco(3.2,.54,-5.7,blanco),false)
  assert.equal(chocaConBlanco(2,-3,-5.7,blanco),false)
 })
+
+test('El escudo absorbe el pulso durante su ventana y las vidas nunca son negativas',async()=>{
+ const {recibirPulso,ESCUDO_DURACION,ESCUDO_RECARGA}=await import('../src/games/arena.js')
+ assert.equal(recibirPulso(3,10+ESCUDO_DURACION,11),3)
+ assert.equal(recibirPulso(3,10+ESCUDO_DURACION,12),2)
+ assert.equal(recibirPulso(0,10,12),0)
+ assert.ok(ESCUDO_RECARGA>ESCUDO_DURACION)
+})
+test('El lector solo indica listo para un blanco cercano, centrado y abierto',async()=>{
+ const {estadoLector}=await import('../src/games/arena.js')
+ const blanco={distancia:3,centrado:true,abierto:true}
+ assert.equal(estadoLector(blanco),'listo')
+ assert.equal(estadoLector({...blanco,distancia:7}),'lejos')
+ assert.equal(estadoLector({...blanco,centrado:false}),'buscando')
+ assert.equal(estadoLector({...blanco,abierto:false}),'cerrado')
+})

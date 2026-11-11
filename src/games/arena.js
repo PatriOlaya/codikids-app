@@ -1,8 +1,8 @@
 export const ARENAS = [
  {nombre:'Jardín flotante',color:0x50cbb0,cielo:0xc0dff4,objetivo:3,descripcion:'Cruza islas, salta los huecos y acierta tres blancos.'},
- {nombre:'Cañón de cristal',color:0xa690ed,cielo:0xc7c1eb,objetivo:4,descripcion:'Plataformas más estrechas y blancos que se mueven.'},
- {nombre:'Ciudad del pulso',color:0xf4b864,cielo:0x8ca4c9,objetivo:5,descripcion:'Los blancos se protegen con escudos intermitentes. Espera la apertura.'},
- {nombre:'Reactor celeste',color:0x62cce7,cielo:0x92bbd8,objetivo:6,descripcion:'Combina plataformas estrechas, blancos móviles y escudos.'},
+ {nombre:'Cañón de cristal',color:0xa690ed,cielo:0xc7c1eb,objetivo:4,descripcion:'Cruza plataformas estrechas, sigue los blancos móviles y esquiva al primer guardián.'},
+ {nombre:'Ciudad del pulso',color:0xf4b864,cielo:0x8ca4c9,objetivo:5,descripcion:'Espera que se abra el escudo del blanco mientras esquivas los pulsos del guardián.'},
+ {nombre:'Reactor celeste',color:0x62cce7,cielo:0x92bbd8,objetivo:6,descripcion:'Combina saltos, blancos móviles, escudos intermitentes y pulsos más rápidos.'},
 ]
 // El primer elemento de cada pregunta es la respuesta correcta; se mezcla al presentarla.
 export const PREGUNTAS = [
@@ -38,4 +38,18 @@ export function plataformasPara(ronda){return Array.from({length:9},(_,i)=>({x:i
 // El pedestal ocupa espacio en la isla; el robot puede rodearlo.
 export function chocaConBlanco(x,y,z,blanco,r=.98){
  return y < blanco.y+1 && y+2.1 > blanco.y-2.65 && Math.hypot(x-blanco.x,z-blanco.z)<r
+}
+
+export const ESCUDO_DURACION = 1.45
+export const ESCUDO_RECARGA = 4.5
+export const PULSO_AVISO = 1.1
+
+export function recibirPulso(vidas, protegidoHasta, ahora) {
+ return ahora < protegidoHasta ? vidas : Math.max(0, vidas-1)
+}
+
+export function estadoLector({distancia, centrado, abierto}) {
+ if(distancia>5.2) return 'lejos'
+ if(!centrado) return 'buscando'
+ return abierto ? 'listo' : 'cerrado'
 }
