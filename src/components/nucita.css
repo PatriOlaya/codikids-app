@@ -1,0 +1,29 @@
+.nucita-overlay{background:radial-gradient(ellipse at 50% 0%,#393354,#171c31 62%);color:#f8f3f0}
+.nucita-shell{max-width:1060px;margin:auto;font-family:var(--font-body,system-ui,sans-serif)}
+.nucita-header,.nucita-chapter{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.nucita-header small,.nucita-speaker{font-size:.74rem;letter-spacing:.13em;font-weight:800;color:#f5cc8e}
+.nucita-header h2{font:700 clamp(1.55rem,4vw,2.65rem) Georgia,serif;line-height:1.1;margin:.35rem 0 1rem;color:#fff6e8}
+.nucita-chapter{padding:.7rem 1rem;background:#322b47;border:1px solid #75657b;border-radius:18px 18px 0 0;font-weight:700;color:#f7e5cf}
+.nucita-escena{position:relative;min-height:250px;aspect-ratio:960/430;overflow:hidden;background:#87988b;border:1px solid #75657b;border-top:0;border-radius:0 0 18px 18px}
+.nucita-escena>svg:first-child{position:absolute;width:100%;height:100%;inset:0}
+.nucita-coneja{position:absolute;bottom:1%;left:12%;height:72%;width:30%;filter:drop-shadow(0 5px 10px #201b3770);animation:nucita-bob 3.7s ease-in-out infinite}
+.nucita-punto,.nucita-primary,.nucita-secondary,.nucita-bloque{font:700 .9rem system-ui,sans-serif;border-radius:12px;padding:.67rem .85rem;cursor:pointer;line-height:1.35}
+.nucita-punto{position:absolute;border:2px solid #fff4cf;background:#25243b;color:#fff9ed;box-shadow:0 4px 15px #2f21336b;transform:translateX(-50%);white-space:nowrap}
+.nucita-huellas{left:56%;bottom:11%}.nucita-hoja{left:76%;top:46%}.nucita-cinta{left:63%;bottom:18%}
+.nucita-primary{background:#f8d798;color:#342637;border:1px solid #f8d798}
+.nucita-secondary{background:#37304d;color:#fff0df;border:1px solid #847692}
+.nucita-secondary[aria-pressed=true]{border-color:#ffd290}
+.nucita-content{display:grid;grid-template-columns:1.35fr 1fr;gap:12px;margin-top:14px}
+.nucita-dialogo,.nucita-cuaderno,.nucita-editor{background:#292740;border:1px solid #5b526e;border-radius:16px;padding:17px}
+.nucita-cuaderno h3,.nucita-editor h3{margin:0 0 .6rem;color:#fff1da}.nucita-editor h3{margin-top:.35rem}
+.nucita-shell p{margin:.65rem 0;line-height:1.55}.nucita-editor{margin-top:12px}
+.nucita-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.nucita-bloque{color:#191529;border:1px solid #fff3ca;background:#efbe76;display:inline-block}
+.nucita-bloque[data-tipo=apariencia]{background:#c3a7ef}.nucita-bloque[data-tipo=control]{background:#a4ddbc}
+.nucita-programa{padding-left:1.5rem;min-height:36px}.nucita-programa li{margin:.45rem 0}.nucita-programa li button{margin-left:.4rem;padding:.4rem .6rem}
+.nucita-shell button:focus-visible{outline:3px solid #fff4ac;outline-offset:3px}
+.nucita-feedback{border-left:3px solid #f1cc86;padding:.3rem .65rem;background:#3e354b}.nucita-footer{padding:12px 0;color:#dbcfe2;font-size:.82rem}
+.nucita-luciernaga,.nucita-brillo{animation:nucita-twinkle 3.4s ease-in-out infinite alternate}
+@keyframes nucita-bob{50%{transform:translateY(-4px)}}@keyframes nucita-twinkle{50%{opacity:.32}}
+@media(max-width:620px){.nucita-content{grid-template-columns:1fr}.nucita-coneja{height:65%;width:36%;left:5%}.nucita-punto{font-size:.77rem;padding:.55rem .6rem}.nucita-hoja{left:78%}.nucita-escena{min-height:235px}}
+@media(prefers-reduced-motion:reduce){.nucita-coneja,.nucita-luciernaga,.nucita-brillo{animation:none}}
