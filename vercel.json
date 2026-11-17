@@ -1,6 +1,14 @@
 {
   "rewrites": [
     {
+      "source": "/curso-creacion-paginas-web-para-ninos",
+      "destination": "/curso-creacion-paginas-web-para-ninos/index.html"
+    },
+    {
+      "source": "/principios-de-robotica-para-ninos",
+      "destination": "/principios-de-robotica-para-ninos/index.html"
+    },
+    {
       "source": "/curso-scratch-para-ninos",
       "destination": "/curso-scratch-para-ninos/index.html"
     },

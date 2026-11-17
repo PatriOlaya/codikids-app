@@ -2,7 +2,7 @@ import { createServer } from 'vite'
 import { renderToString } from 'react-dom/server'
 import { createElement } from 'react'
 import { readFile, writeFile, mkdir } from 'node:fs/promises'
-import { origin, pages, levels, faq, articles } from '../src/marketing/content.js'
+import { origin, pages, levels, faq, articles, newCourses } from '../src/marketing/content.js'
 const server = await createServer({ server: { middlewareMode: true }, appType: 'custom' })
 const escape = value => value.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
 const organization = { '@type': 'EducationalOrganization', '@id': origin + '/#organization', name: 'CODIKIDS', url: origin + '/', logo: origin + '/favicon.svg', telephone: '+573193579832', email: 'codikidspro@gmail.com', address: { '@type': 'PostalAddress', addressLocality: 'Ibagué', addressRegion: 'Tolima', addressCountry: 'CO' } }
@@ -20,6 +20,8 @@ try {
       graph.push(...levels.map(([name, intro, topics]) => ({ '@type': 'Course', name: 'Scratch ' + name, description: intro + '. ' + topics, url, provider: { '@id': organization['@id'] }, inLanguage: 'es', educationalLevel: name, hasCourseInstance: { '@type': 'CourseInstance', courseMode: 'online', courseWorkload: 'PT6H' } })))
       graph.push({ '@type': 'FAQPage', mainEntity: faq.map(([name, text]) => ({ '@type': 'Question', name, acceptedAnswer: { '@type': 'Answer', text } })) })
     }
+    const course = newCourses.find(item => item.path === path)
+    if (course) graph.push({ '@type': 'Course', name: course.name, description: course.intro, url, provider: { '@id': organization['@id'] }, inLanguage: 'es-CO' })
     if (article) graph.push({ '@type': 'BlogPosting', headline: article.title, description: article.description, mainEntityOfPage: url, datePublished: '2026-10-05', dateModified: '2026-10-05', author: { '@id': organization['@id'] }, publisher: { '@id': organization['@id'] }, image: origin + '/og-image.jpg', inLanguage: 'es-CO' })
     const head = `<title>${escape(page.title)}</title>\n<meta name="description" content="${escape(page.description)}">\n<meta name="robots" content="${path === '/404' ? 'noindex, follow' : 'index, follow'}">\n<link rel="canonical" href="${url}">\n<meta property="og:type" content="${article ? 'article' : 'website'}">\n<meta property="og:url" content="${url}">\n<meta property="og:title" content="${escape(page.title)}">\n<meta property="og:description" content="${escape(page.description)}">\n<meta property="og:image" content="${origin}/og-image.jpg">\n<meta property="og:image:alt" content="CODIKIDS, programación para niños">\n<meta property="og:locale" content="es_CO">\n<meta property="og:site_name" content="CODIKIDS">\n<meta name="twitter:card" content="summary_large_image">\n<meta name="twitter:title" content="${escape(page.title)}">\n<meta name="twitter:description" content="${escape(page.description)}">\n<meta name="twitter:image" content="${origin}/og-image.jpg">\n<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@graph': graph }).replaceAll('<', '\\u003c')}</script>`
     const html = template.replace('<!-- seo-head -->', head).replace('<div id="root"></div>', `<div id="root">${renderToString(createElement(PublicSite, { path }))}</div>`)
@@ -28,5 +30,5 @@ try {
     await writeFile(path === '/404' ? 'dist/404.html' : dir + '/index.html', html)
   }
   await writeFile('dist/sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${Object.keys(pages).map(path => `<url><loc>${origin}${path}</loc></url>`).join('')}</urlset>`)
-  console.log('Prerendered 7 public routes and 404; sitemap generated.')
+  console.log('Prerendered ' + Object.keys(pages).length + ' public routes and 404; sitemap generated.')
 } finally { await server.close() }

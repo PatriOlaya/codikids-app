@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
-import { origin, pages } from '../src/marketing/content.js'
+import { origin, pages, learningRoutes, newCourses } from '../src/marketing/content.js'
 const sitemap = await readFile('dist/sitemap.xml', 'utf8')
 for (const [path, page] of Object.entries(pages)) {
   const html = await readFile(path === '/' ? 'dist/index.html' : `dist${path}/index.html`, 'utf8')
@@ -14,6 +14,10 @@ for (const [path, page] of Object.entries(pages)) {
   assert.ok(schema['@graph'].some(x => x['@type'] === 'WebPage'))
   if (path.includes('/blog/')) assert.ok(schema['@graph'].some(x => x['@type'] === 'BlogPosting'))
   if (path === '/curso-scratch-para-ninos') assert.equal(schema['@graph'].filter(x => x['@type'] === 'Course').length, 3)
+  if (path === '/' || path === '/programacion-para-ninos-ibague') {
+    for (const route of learningRoutes) assert.ok(html.includes('href="' + route.path + '"'), path + ': missing route ' + route.path)
+  }
+  if (newCourses.some(course => course.path === path)) assert.ok(schema['@graph'].some(item => item['@type'] === 'Course'))
   for (const [, href] of html.matchAll(/href="(\/[^"#?]*)"/g)) {
     if (href === '/entrar' || href.startsWith('/assets/') || href.endsWith('.svg')) continue
     assert.ok(pages[href], path + ': broken internal link ' + href)
@@ -21,4 +25,4 @@ for (const [path, page] of Object.entries(pages)) {
 }
 assert.ok((await readFile('dist/app.html', 'utf8')).includes('noindex, nofollow'))
 assert.ok((await readFile('dist/404.html', 'utf8')).includes('noindex, follow'))
-console.log('SEO checks passed: 7 routes, metadata, schema, sitemap, links, private shell and 404.')
+console.log('SEO checks passed: ' + Object.keys(pages).length + ' routes, metadata, schema, sitemap, links, private shell and 404.')

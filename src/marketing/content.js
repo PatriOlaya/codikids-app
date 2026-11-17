@@ -35,10 +35,65 @@ export const articles = [
     ['Un primer reto sencillo', 'Pídele que haga mover un personaje con una tecla y llegar a una meta. Después puede añadir un sonido o cambiar el escenario. Consulta con CODIKIDS qué ruta se adapta a su experiencia y disponibilidad.'],
   ], sources: [['Edades y orientación para familias de Scratch', 'https://scratch.mit.edu/help/parents/']] },
 ]
+export const newCourses = [
+  {
+    "path": "/curso-creacion-paginas-web-para-ninos",
+    "name": "Creación de páginas web",
+    "firstLevel": "Web Exploradores",
+    "tag": "4 NIVELES · EMPIEZA CON WEB EXPLORADORES",
+    "short": "Una ruta de cuatro niveles que empieza diseñando tu primera página web en el navegador.",
+    "intro": "Tu hijo empieza diseñando de forma visual y avanza paso a paso hacia el código. En ocho clases de 45 minutos crea una página propia, con acompañamiento y actividades que puede hacer desde el navegador.",
+    "topics": [
+      [
+        "Diseña la página",
+        "Elige un tema y organiza títulos, imágenes y secciones."
+      ],
+      [
+        "Dale estilo",
+        "Prueba colores, tipografías y distribuciones para darle personalidad a su página."
+      ],
+      [
+        "Construye un proyecto propio",
+        "Combina lo aprendido en una página sobre un tema que le interese, como su deporte o animal favorito."
+      ]
+    ],
+    "cta": "Consultar cupos de Web Exploradores"
+  },
+  {
+    "path": "/principios-de-robotica-para-ninos",
+    "name": "Principios de Robótica",
+    "tag": "INICIACIÓN A LA ROBÓTICA",
+    "short": "Descubre cómo un robot sigue instrucciones y responde a su entorno.",
+    "intro": "Una introducción para niños curiosos por saber cómo funcionan los robots. Exploramos cómo dar instrucciones, en qué orden ejecutarlas y cómo una máquina puede responder a lo que detecta.",
+    "topics": [
+      [
+        "Da instrucciones claras",
+        "Organiza acciones en secuencia para que un robot llegue a una meta."
+      ],
+      [
+        "Explora sensores y movimiento",
+        "Distingue entre lo que un robot detecta, la decisión que toma y cómo actúa."
+      ],
+      [
+        "Pon una idea a prueba",
+        "Imagina un robot que evita un obstáculo y explica las reglas que necesitaría para hacerlo."
+      ]
+    ],
+    "cta": "Consultar cupos de Principios de Robótica"
+  }
+]
+
+export const learningRoutes = [
+  { path: '/curso-scratch-para-ninos', name: 'Videojuegos con Scratch', tag: '3 NIVELES · EXPLORADORES, NINJA Y MAESTRO', short: 'Crea videojuegos y animaciones programando con bloques.' },
+  ...newCourses,
+]
+export const courseWhatsApp = name => 'https://wa.me/573193579832?text=' + encodeURIComponent('Hola, me interesa la ruta ' + name + ' de CODIKIDS. ¿Me cuentan los horarios, requisitos y cupos?')
+
 export const pages = {
-  '/': { title: 'CODIKIDS | Programación para niños online en Colombia', description: 'Clases online de Scratch para niños de 8 a 12 años. Crea videojuegos en tres niveles con práctica guiada y seguimiento familiar. Nacimos en Ibagué.' },
+  ...Object.fromEntries(newCourses.map(course => [course.path, { title: course.name + ' para niños' + ' | CODIKIDS', description: course.short }])),
+  '/': { title: 'CODIKIDS | Programación para niños online en Colombia', description: 'Explora las rutas de CODIKIDS: videojuegos con Scratch, creación de páginas web y principios de robótica para niños.' },
   '/curso-scratch-para-ninos': { title: 'Curso Scratch para niños online | CODIKIDS', description: 'Conoce Exploradores, Ninja y Maestro: 8 clases por nivel para crear videojuegos con Scratch. Metodología, proyectos y preguntas para familias.' },
-  '/programacion-para-ninos-ibague': { title: 'Programación para niños en Ibagué, online | CODIKIDS', description: 'CODIKIDS nació en Ibagué y ofrece clases online de Scratch para niños. Conoce los proyectos y la ruta futura de Python, IA y Robótica.' },
+  '/programacion-para-ninos-ibague': { title: 'Programación para niños en Ibagué, online | CODIKIDS', description: 'CODIKIDS nació en Ibagué. Conoce nuestras rutas para niños: videojuegos con Scratch, creación de páginas web y principios de robótica.' },
   '/blog': { title: 'Blog de programación para niños | CODIKIDS', description: 'Guías para familias: Scratch vs Roblox Studio, beneficios de programar y edades para empezar con Scratch.' },
   ...Object.fromEntries(articles.map(a => ['/blog/' + a.slug, {title: a.title + ' | CODIKIDS', description: a.description}])),
 }
