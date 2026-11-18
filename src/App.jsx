@@ -5,6 +5,7 @@ import { supabase } from './lib/supabase'
 const Landing = lazy(() => import('./marketing/PublicSite'))
 const Login = lazy(() => import('./pages/Login'))
 const Laboratorio = lazy(() => import('./pages/Laboratorio'))
+const ChatDocente = lazy(() => import('./components/ChatDocente'))
 const Admin = lazy(() => import('./pages/Admin'))
 const VistaParent = lazy(() => import('./pages/VistaParent'))
 
@@ -50,6 +51,7 @@ export default function App() {
           <Route path="/padre/:estudianteId" element={<VistaParent />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        {user && !isAdmin && <ChatDocente user={user} />}
       </Suspense>
     </BrowserRouter>
   )

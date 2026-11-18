@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import Certificado from '../components/Certificado'
+import ActividadJuegos from '../components/ActividadJuegos'
+import ChatDocente from '../components/ChatDocente'
 
 const APP_URL = 'https://codikids-app.vercel.app'
 
@@ -130,12 +132,15 @@ export default function Admin({ user, onLogout }) {
 
         {/* Tabs */}
         <div style={{ display:'flex', gap:8, marginBottom:'1.5rem' }}>
-          {[['estudiantes','👨‍🎓 Estudiantes'],['misiones','✅ Misiones']].map(([tab, label]) => (
+          {[['estudiantes','👨‍🎓 Estudiantes'],['misiones','✅ Misiones'],['actividad','📊 Actividad'],['chat','💬 Mensajes']].map(([tab, label]) => (
             <button key={tab} onClick={() => setActiveTab(tab)} style={{ padding:'.6rem 1.2rem', borderRadius:99, border:`1px solid ${activeTab===tab ? 'rgba(127,119,221,.5)' : 'rgba(255,255,255,.12)'}`, background: activeTab===tab ? 'rgba(127,119,221,.2)' : 'transparent', color:activeTab===tab ? '#fff' : 'rgba(255,255,255,.5)', fontFamily:'var(--font-body)', fontWeight:700, fontSize:'.9rem', cursor:'pointer' }}>
               {label}
             </button>
           ))}
         </div>
+
+        {activeTab === 'chat' && <ChatDocente user={user} estudiantes={estudiantes} esDocente />}
+        {activeTab === 'actividad' && <ActividadJuegos estudiantes={estudiantes} />}
 
         {/* ══════════════ TAB ESTUDIANTES ══════════════ */}
         {activeTab === 'estudiantes' && (
