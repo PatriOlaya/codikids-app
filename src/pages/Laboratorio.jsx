@@ -1,5 +1,6 @@
 import GaleriaDesafios from '../components/GaleriaDesafios'
-import { lazy, Suspense, useEffect, useState } from 'react'
+import { registrarActividad } from '../lib/actividadJuegos'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import Planeta from '../components/Planeta'
 import MundosNivel3 from '../components/MundosNivel3'
@@ -18,6 +19,9 @@ const ArenaScratch3D = lazy(() => import('../components/ArenaScratch3D'))
 const INSIGNIAS = ['🌍','🌊','🌳','🏙','⚡','🌙','🌀','⭐']
 
 export default function Laboratorio({ user, onLogout }) {
+  const inicioJuego = useRef({})
+  function abrirJuego(id, setter){inicioJuego.current[id]=Date.now();registrarActividad(user.id,id,'abrir');setter(true)}
+  function cerrarJuego(id,setter){const inicio=inicioJuego.current[id];if(inicio)registrarActividad(user.id,id,'cerrar',(Date.now()-inicio)/1000);delete inicioJuego.current[id];setter(false)}
   const [estudiante, setEstudiante]     = useState(null)
   const [misiones, setMisiones]         = useState([])
   const [progreso, setProgreso]         = useState([])
@@ -113,9 +117,9 @@ export default function Laboratorio({ user, onLogout }) {
         </header>
 
         <GaleriaDesafios abrir={{
-          turbo:()=>setEnTurbo(true), nucita:()=>setEnNucita(true), islas:()=>setEnArena(true),
-          robot:()=>setEnCodigoRoto(true), circuito:()=>setEnCircuitos(true),
-          espacio:()=>setEnMinijuego(true),
+          turbo:()=>abrirJuego('turbo',setEnTurbo), nucita:()=>abrirJuego('nucita',setEnNucita), islas:()=>abrirJuego('islas',setEnArena),
+          robot:()=>abrirJuego('robot',setEnCodigoRoto), circuito:()=>abrirJuego('circuito',setEnCircuitos),
+          espacio:()=>abrirJuego('espacio',setEnMinijuego),
         }} />
 
         {estudiante?.nivel !== 3 && <>
@@ -160,10 +164,10 @@ export default function Laboratorio({ user, onLogout }) {
 
         {estudiante?.nivel === 3 && <MundosNivel3 misiones={misiones} progreso={progreso} inventos={inventos} onJugar={() => setEnTaller(true)} onSubir={misionId => setModalInvento({ misionId })} />}
 
-        {enTurbo && <Suspense fallback={<div className="game-overlay"><p>Cargando Circuito Turbo…</p><button className="btn-ghost" onClick={()=>setEnTurbo(false)}>Cerrar</button></div>}><CircuitoTurbo estudianteId={user.id} onCerrar={()=>setEnTurbo(false)} /></Suspense>}
-        {enNucita && <Suspense fallback={<div className="game-overlay"><p>Abriendo el cuento de Nucita…</p><button className="btn-ghost" onClick={()=>setEnNucita(false)}>Cerrar</button></div>}><Nucita estudianteId={user.id} onCerrar={()=>setEnNucita(false)} /></Suspense>}
-        {enArena && <Suspense fallback={<div className="game-overlay"><p>Cargando Islas del Código 3D…</p><button className="btn-ghost" onClick={()=>setEnArena(false)}>Cerrar</button></div>}><ArenaScratch3D estudianteId={user.id} onCerrar={()=>setEnArena(false)} /></Suspense>}
-        {enCircuitos && <Circuitos estudianteId={user.id} onCerrar={()=>setEnCircuitos(false)} />}
+        {enTurbo && <Suspense fallback={<div className="game-overlay"><p>Cargando Circuito Turbo…</p><button className="btn-ghost" onClick={()=>setEnTurbo(false)}>Cerrar</button></div>}><CircuitoTurbo estudianteId={user.id} onCerrar={()=>cerrarJuego('turbo',setEnTurbo)} /></Suspense>}
+        {enNucita && <Suspense fallback={<div className="game-overlay"><p>Abriendo el cuento de Nucita…</p><button className="btn-ghost" onClick={()=>setEnNucita(false)}>Cerrar</button></div>}><Nucita estudianteId={user.id} onCerrar={()=>cerrarJuego('nucita',setEnNucita)} /></Suspense>}
+        {enArena && <Suspense fallback={<div className="game-overlay"><p>Cargando Islas del Código 3D…</p><button className="btn-ghost" onClick={()=>setEnArena(false)}>Cerrar</button></div>}><ArenaScratch3D estudianteId={user.id} onCerrar={()=>cerrarJuego('islas',setEnArena)} /></Suspense>}
+        {enCircuitos && <Circuitos estudianteId={user.id} onCerrar={()=>cerrarJuego('circuito',setEnCircuitos)} />}
 
         {/* ── Mapa de Aventura ── */}
         {estudiante?.nivel !== 3 && (
