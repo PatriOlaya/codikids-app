@@ -6,6 +6,8 @@ const JUEGOS=[
  {id:'islas',titulo:'Islas del Código',tipo:'Aventura 3D',detalle:'Salta entre islas, esquiva pulsos y resuelve retos de Scratch.',color:'#91f4da',fondo:'#143f52'},
  {id:'robot',titulo:'Código Roto',tipo:'Lógica',detalle:'Ordena instrucciones para guiar al robot por ocho misiones.',color:'#b4cbff',fondo:'#243966'},
  {id:'circuito',titulo:'Guardianes del Circuito',tipo:'Rompecabezas',detalle:'Gira piezas y conecta ocho reactores.',color:'#fcd98c',fondo:'#4f315b'},
+ {id:'tresraya',titulo:'Tres en raya IA',tipo:'Duelo estratégico · Contra la máquina',detalle:'Desafía a una IA en tres dificultades, incluida una imbatible.',color:'#9debd9',fondo:'#253e6b'},
+ {id:'matematicas',titulo:'Duelo Matemático',tipo:'Cálculo rápido · Contra la máquina',detalle:'Compite en 10 rondas y supera al robot con sumas, restas y multiplicaciones.',color:'#ffe49d',fondo:'#5d345a'},
  {id:'espacio',titulo:'Expedición espacial',tipo:'Reflejos',detalle:'Pilota tu nave entre meteoritos y reúne estrellas.',color:'#ffaeba',fondo:'#42274d'},
 ]
 function Portada({id}){
@@ -16,12 +18,14 @@ function Portada({id}){
  {id==='islas'&&<g stroke="#b2ffeb" strokeWidth="2"><path d="M80 52l52-19 53 17-54 21z" fill="#55bca5"/><path d="M80 52l51 19 54-21-15 35-39 14-32-15z" fill="#255c72"/><path d="M130 51V18m-10 7 10-10 10 10" fill="none"/><path d="M47 67l23-9 22 8-24 9zM171 81l25-9 25 8-25 10z" fill="#62caaf"/></g>}
  {id==='robot'&&<g stroke="#bdcbff" strokeWidth="3"><rect x="89" y="34" width="83" height="55" rx="18" fill="#626fc3"/><rect x="101" y="45" width="59" height="30" rx="9" fill="#1b244a"/><path d="M129 34V19" strokeLinecap="round"/><circle cx="129" cy="16" r="5" fill="#fff2b4"/><path d="M115 60h2m25 0h2" stroke="#a1ffdf" strokeWidth="7" strokeLinecap="round"/><path d="M80 56h9m83 0h9" strokeWidth="8" strokeLinecap="round"/></g>}
  {id==='circuito'&&<g stroke="#ffe6a8" strokeWidth="4" fill="none"><rect x="102" y="27" width="57" height="57" rx="11" fill="#704779"/><path d="M102 43H76V25M102 66H64v20m95-43h26V25m-26 41h35v20M123 27V13m15 71v13"/>{[[76,25],[64,86],[185,25],[194,86],[123,13],[138,97]].map(([x,y])=><circle key={x} cx={x} cy={y} r="4" fill="#ffdf9b"/>)}<path d="M135 39l-15 19h11l-5 14 17-21h-11z" fill="#ffe6a8" stroke="none"/></g>}
+ {id==='tresraya'&&<g fontSize="47" fontWeight="bold" textAnchor="middle"><text x="105" y="70" fill="#a7f4e2">✕</text><text x="160" y="70" fill="#ffe1a3">○</text></g>}
+ {id==='matematicas'&&<g fontSize="36" fontWeight="bold" textAnchor="middle"><text x="105" y="70" fill="#fff2a8">7</text><text x="160" y="70" fill="#c1e7ff">×</text></g>}
  {id==='espacio'&&<g transform="translate(130 56) rotate(30)"><path d="M-14 19l-8 18 18-5m18-13 8 18-18-5" fill="#ec89aa"/><path d="M0-38q26 20 14 59h-28Q-26-18 0-38z" fill="#f5e3f3" stroke="#a884c4" strokeWidth="3"/><circle cy="-6" r="9" fill="#6959a0" stroke="#e0c4ff" strokeWidth="3"/><path d="M-7 26Q-10 38 0 48q10-10 7-22z" fill="#ffd490"/></g>}
  </svg>
 }
 export default function GaleriaDesafios({abrir}){
  return <section className="galeria-desafios" id="central-desafios" aria-labelledby="titulo-desafios">
-  <div className="galeria-intro"><span className="galeria-eyebrow">🎮 ZONA DE JUEGOS</span><h2 id="titulo-desafios">Central de desafíos</h2><p>Elige tu próxima aventura. Hay seis juegos para explorar.</p></div>
+  <div className="galeria-intro"><span className="galeria-eyebrow">🎮 ZONA DE JUEGOS</span><h2 id="titulo-desafios">Central de desafíos</h2><p>Elige tu próxima aventura. Hay ocho juegos para explorar, incluidos dos desafíos contra la máquina.</p></div>
   <div className="galeria-grid">{JUEGOS.map(j=><article key={j.id} className="galeria-juego" style={{'--acento':j.color,'--portada':j.fondo}}>
    <Portada id={j.id}/><div className="galeria-detalle"><small>{j.tipo}</small><h3>{j.titulo}</h3><p>{j.detalle}</p><button type="button" aria-label={`Jugar a ${j.titulo}`} onClick={()=>abrir[j.id]()}>▶ Jugar</button></div>
   </article>)}</div>
