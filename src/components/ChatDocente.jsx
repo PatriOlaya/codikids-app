@@ -12,8 +12,8 @@ export default function ChatDocente({user,estudiantes=[],esDocente=false}){
  },[seleccion])
  useEffect(()=>{if(!abierto)return;last.current=null;cargar();const t=setInterval(cargar,8000);return()=>clearInterval(t)},[cargar,abierto])
  async function enviar(e){e.preventDefault();const contenido=texto.trim();if(!contenido||contenido.length>1000||enviando||!seleccion)return;setEnviando(true);setError('')
- const {error:e}=await supabase.from('chat_mensajes').insert({estudiante_id:seleccion,remitente_id:user.id,remitente_rol:esDocente?'docente':'estudiante',contenido})
- if(e)setError('No se pudo enviar el mensaje. Intenta de nuevo.');else{setTexto('');await cargar()}setEnviando(false)}
+ const {error:envioError}=await supabase.from('chat_mensajes').insert({estudiante_id:seleccion,remitente_id:user.id,remitente_rol:esDocente?'docente':'estudiante',contenido})
+ if(envioError)setError('No se pudo enviar el mensaje. Intenta de nuevo.');else{setTexto('');await cargar()}setEnviando(false)}
  const panel=<section style={{background:'#1d183b',color:'#fff',border:'1px solid #7365ae',borderRadius:16,padding:16,maxWidth:esDocente?'100%':380,width:'100%',boxShadow:'0 14px 35px #0006'}} aria-label="Chat privado con CodiKids">
  <header style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:12}}><h3 style={{margin:'0 0 10px'}}>💬 {esDocente?'Mensajes de estudiantes':'Hablar con mi profe'}</h3>{!esDocente&&<button onClick={()=>setAbierto(false)} aria-label="Cerrar chat">✕</button>}</header>
  {esDocente&&<label style={{display:'block',marginBottom:12}}>Conversación<select value={seleccion} onChange={e=>setSeleccion(e.target.value)} style={{display:'block',width:'100%',padding:10}}><option value="">Selecciona un estudiante</option>{estudiantes.map(e=><option key={e.id} value={e.id}>{e.nombre}</option>)}</select></label>}
