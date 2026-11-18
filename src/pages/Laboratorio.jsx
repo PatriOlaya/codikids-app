@@ -10,6 +10,8 @@ import ConstructorAvatar from './ConstructorAvatar'
 import MinijuegoEstrellas from '../components/MinijuegoEstrellas'
 import Insignias from '../components/Insignias'
 import CodigoRoto from '../components/CodigoRoto'
+import TresEnRayaIA from '../components/TresEnRayaIA'
+import DueloMatematicoIA from '../components/DueloMatematicoIA'
 import Circuitos from '../components/Circuitos'
 
 const CircuitoTurbo = lazy(() => import('../components/CircuitoTurbo'))
@@ -29,6 +31,8 @@ export default function Laboratorio({ user, onLogout }) {
   const [loading, setLoading]           = useState(true)
   const [modalInvento, setModalInvento] = useState(null)
   const [enConstructor, setEnConstructor] = useState(false)
+  const [enTresRaya,setEnTresRaya]=useState(false)
+  const [enMatematicas,setEnMatematicas]=useState(false)
   const [enTurbo,setEnTurbo]=useState(false)
   const [enNucita, setEnNucita] = useState(false)
   const [enArena, setEnArena] = useState(false)
@@ -120,6 +124,7 @@ export default function Laboratorio({ user, onLogout }) {
           turbo:()=>abrirJuego('turbo',setEnTurbo), nucita:()=>abrirJuego('nucita',setEnNucita), islas:()=>abrirJuego('islas',setEnArena),
           robot:()=>abrirJuego('robot',setEnCodigoRoto), circuito:()=>abrirJuego('circuito',setEnCircuitos),
           espacio:()=>abrirJuego('espacio',setEnMinijuego),
+          tresraya:()=>setEnTresRaya(true), matematicas:()=>setEnMatematicas(true),
         }} />
 
         {estudiante?.nivel !== 3 && <>
@@ -247,6 +252,8 @@ export default function Laboratorio({ user, onLogout }) {
         />
       )}
 
+      {enTresRaya && <TresEnRayaIA onCerrar={()=>setEnTresRaya(false)} />}
+      {enMatematicas && <DueloMatematicoIA onCerrar={()=>setEnMatematicas(false)} />}
       {enCodigoRoto && (
         <CodigoRoto
           estudianteId={user.id}
