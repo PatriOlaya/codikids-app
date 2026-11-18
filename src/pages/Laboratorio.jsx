@@ -9,6 +9,8 @@ import ConstructorAvatar from './ConstructorAvatar'
 import MinijuegoEstrellas from '../components/MinijuegoEstrellas'
 import Insignias from '../components/Insignias'
 import CodigoRoto from '../components/CodigoRoto'
+import TresEnRayaIA from '../components/TresEnRayaIA'
+import DueloMatematicoIA from '../components/DueloMatematicoIA'
 import Circuitos from '../components/Circuitos'
 
 const CircuitoTurbo = lazy(() => import('../components/CircuitoTurbo'))
@@ -25,6 +27,8 @@ export default function Laboratorio({ user, onLogout }) {
   const [loading, setLoading]           = useState(true)
   const [modalInvento, setModalInvento] = useState(null)
   const [enConstructor, setEnConstructor] = useState(false)
+  const [enTresRaya,setEnTresRaya]=useState(false)
+  const [enMatematicas,setEnMatematicas]=useState(false)
   const [enTurbo,setEnTurbo]=useState(false)
   const [enNucita, setEnNucita] = useState(false)
   const [enArena, setEnArena] = useState(false)
@@ -116,6 +120,7 @@ export default function Laboratorio({ user, onLogout }) {
           turbo:()=>setEnTurbo(true), nucita:()=>setEnNucita(true), islas:()=>setEnArena(true),
           robot:()=>setEnCodigoRoto(true), circuito:()=>setEnCircuitos(true),
           espacio:()=>setEnMinijuego(true),
+          tresraya:()=>setEnTresRaya(true), matematicas:()=>setEnMatematicas(true),
         }} />
 
         {estudiante?.nivel !== 3 && <>
@@ -164,6 +169,9 @@ export default function Laboratorio({ user, onLogout }) {
         {enNucita && <Suspense fallback={<div className="game-overlay"><p>Abriendo el cuento de Nucita…</p><button className="btn-ghost" onClick={()=>setEnNucita(false)}>Cerrar</button></div>}><Nucita estudianteId={user.id} onCerrar={()=>setEnNucita(false)} /></Suspense>}
         {enArena && <Suspense fallback={<div className="game-overlay"><p>Cargando Islas del Código 3D…</p><button className="btn-ghost" onClick={()=>setEnArena(false)}>Cerrar</button></div>}><ArenaScratch3D estudianteId={user.id} onCerrar={()=>setEnArena(false)} /></Suspense>}
         {enCircuitos && <Circuitos estudianteId={user.id} onCerrar={()=>setEnCircuitos(false)} />}
+
+      {enTresRaya && <TresEnRayaIA onCerrar={()=>setEnTresRaya(false)} />}
+      {enMatematicas && <DueloMatematicoIA onCerrar={()=>setEnMatematicas(false)} />}
 
         {/* ── Mapa de Aventura ── */}
         {estudiante?.nivel !== 3 && (
