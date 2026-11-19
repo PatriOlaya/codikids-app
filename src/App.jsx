@@ -5,6 +5,7 @@ import { supabase } from './lib/supabase'
 const Landing = lazy(() => import('./marketing/PublicSite'))
 const Login = lazy(() => import('./pages/Login'))
 const Laboratorio = lazy(() => import('./pages/Laboratorio'))
+const WebExploradores = lazy(() => import('./pages/WebExploradores'))
 const Admin = lazy(() => import('./pages/Admin'))
 const VistaParent = lazy(() => import('./pages/VistaParent'))
 
@@ -46,6 +47,7 @@ export default function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/entrar" element={user ? <Navigate to={isAdmin ? '/admin' : '/laboratorio'} replace /> : <Login onLogin={setUser} />} />
           <Route path="/laboratorio" element={user && !isAdmin ? <Laboratorio user={user} onLogout={handleLogout} /> : <Navigate to="/entrar" replace />} />
+          <Route path="/web-exploradores" element={user && !isAdmin ? <WebExploradores user={user} /> : <Navigate to="/entrar" replace />} />
           <Route path="/admin" element={isAdmin ? <Admin user={user} onLogout={handleLogout} /> : <Navigate to="/entrar" replace />} />
           <Route path="/padre/:estudianteId" element={<VistaParent />} />
           <Route path="*" element={<Navigate to="/" replace />} />
