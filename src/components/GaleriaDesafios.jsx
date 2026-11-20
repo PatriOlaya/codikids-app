@@ -14,6 +14,8 @@ const JUEGOS=[
 function Portada({id}){
  return <svg viewBox="0 0 260 108" aria-hidden="true" className="galeria-portada">
  <g opacity=".35" fill="currentColor"><circle cx="213" cy="39" r="48"/><circle cx="24" cy="94" r="32"/><circle cx="34" cy="26" r="3"/><circle cx="192" cy="17" r="2"/><circle cx="228" cy="75" r="3"/><path d="M57 57l4-8 4 8-4 8zM190 76l4-8 4 8-4 8z"/></g>
+ {id==='plataformas'&&<g><rect x='0' y='82' width='260' height='26' fill='#4aaf72'/><circle cx='125' cy='55' r='17' fill='#f6c16d'/><rect x='108' y='70' width='34' height='17' fill='#f15f70'/><circle cx='200' cy='60' r='13' fill='#ffd75d'/></g>}
+ {id==='retoexplorador'&&<g fontSize='58' textAnchor='middle'><text x='130' y='78'>🏆</text></g>}
  {id==='turbo'&&<g stroke="#bcffef" strokeWidth="3"><path d="M49 89l26-26h109l28 26z" fill="#314b66"/><path d="M92 66l18-23h46l18 23 14 9v15H77V75z" fill="#55bda9"/><path d="M110 47h46l13 18h-73z" fill="#203352"/><circle cx="104" cy="88" r="10" fill="#242842"/><circle cx="165" cy="88" r="10" fill="#242842"/><path d="M53 45h32m92-17h35m-30 24h45" strokeLinecap="round"/></g>}
  {id==='nucita'&&<g stroke="#654267" strokeWidth="3"><path d="M107 61Q80 8 98 7q11-3 25 38M135 44q6-39 20-39 15 4-4 54" fill="#fff1dc"/><ellipse cx="130" cy="69" rx="38" ry="31" fill="#fff1dc"/><path d="M112 64h1m32 0h1" stroke="#44304e" strokeWidth="7" strokeLinecap="round"/><path d="M125 76q5 7 10 0" fill="none"/><path d="M115 97l17-8 17 8-17 5z" fill="#ed92ae"/><circle cx="104" cy="76" r="5" fill="#f0a6b3" stroke="none"/><circle cx="154" cy="76" r="5" fill="#f0a6b3" stroke="none"/></g>}
  {id==='islas'&&<g stroke="#b2ffeb" strokeWidth="2"><path d="M80 52l52-19 53 17-54 21z" fill="#55bca5"/><path d="M80 52l51 19 54-21-15 35-39 14-32-15z" fill="#255c72"/><path d="M130 51V18m-10 7 10-10 10 10" fill="none"/><path d="M47 67l23-9 22 8-24 9zM171 81l25-9 25 8-25 10z" fill="#62caaf"/></g>}
@@ -30,27 +32,32 @@ const CATEGORIAS = [
  {id:'ingenio',nombre:'Ingenio',icono:'🧩'},
  {id:'duelos',nombre:'Contra la máquina',icono:'🤖'},
 ]
-const GRUPOS={turbo:'aventura',nucita:'aventura',islas:'aventura',robot:'ingenio',circuito:'ingenio',tresraya:'duelos',matematicas:'duelos',espacio:'aventura'}
-const ICONOS={turbo:'🏎️',nucita:'🐰',islas:'🏝️',robot:'🤖',circuito:'⚡',tresraya:'⭕',matematicas:'🧠',espacio:'🚀'}
-const DIFICULTADES={turbo:'Velocidad',nucita:'Exploración',islas:'Aventura',robot:'Lógica',circuito:'Ingenio',tresraya:'Estrategia',matematicas:'Cálculo',espacio:'Reflejos'}
-export default function GaleriaDesafios({abrir}){
+const GRUPOS={plataformas:'aventura',retoexplorador:'ingenio',turbo:'aventura',nucita:'aventura',islas:'aventura',robot:'ingenio',circuito:'ingenio',tresraya:'duelos',matematicas:'duelos',espacio:'aventura'}
+const ICONOS={plataformas:'🍄',retoexplorador:'🏆',turbo:'🏎️',nucita:'🐰',islas:'🏝️',robot:'🤖',circuito:'⚡',tresraya:'⭕',matematicas:'🧠',espacio:'🚀'}
+const DIFICULTADES={plataformas:'Saltos',retoexplorador:'Lógica avanzada',turbo:'Velocidad',nucita:'Exploración',islas:'Aventura',robot:'Lógica',circuito:'Ingenio',tresraya:'Estrategia',matematicas:'Cálculo',espacio:'Reflejos'}
+export default function GaleriaDesafios({abrir,nivel=2,retoHabilitado=false}){
+ const juegosNivel1=[
+  {id:'plataformas',titulo:'Aventura del Bosque',tipo:'Plataformas · Exploradores',detalle:'Salta, recoge monedas y esquiva obstáculos en una aventura de tres etapas.',color:'#8ff2ba',fondo:'#225359'},
+  ...(retoHabilitado?[{id:'retoexplorador',titulo:'Desafío Maestro Explorador',tipo:'Lógica avanzada · Acceso especial',detalle:'Resuelve patrones, memoria y cálculos contrarreloj.',color:'#ffd18b',fondo:'#59416a'}]:[])
+ ]
+ const catalogo=nivel===1?juegosNivel1:JUEGOS
  const [categoria,setCategoria]=useState('todos')
  const [busqueda,setBusqueda]=useState('')
- const [destacado,setDestacado]=useState('islas')
- const visibles=useMemo(()=>JUEGOS.filter(j=>(categoria==='todos'||GRUPOS[j.id]===categoria)&&(`${j.titulo} ${j.tipo} ${j.detalle}`.toLocaleLowerCase('es').includes(busqueda.trim().toLocaleLowerCase('es')))),[categoria,busqueda])
- const elegido=JUEGOS.find(j=>j.id===destacado)||JUEGOS[0]
+ const [destacado,setDestacado]=useState(nivel===1?'plataformas':'islas')
+ const visibles=useMemo(()=>catalogo.filter(j=>(categoria==='todos'||GRUPOS[j.id]===categoria)&&(`${j.titulo} ${j.tipo} ${j.detalle}`.toLocaleLowerCase('es').includes(busqueda.trim().toLocaleLowerCase('es')))),[categoria,busqueda,nivel,retoHabilitado])
+ const elegido=catalogo.find(j=>j.id===destacado)||catalogo[0]
  function jugar(id){if(typeof abrir?.[id]==='function')abrir[id]()}
  return <section className="galeria-desafios" id="central-desafios" aria-labelledby="titulo-desafios">
   <div className="arcade-stars" aria-hidden="true"><span>✦</span><span>✧</span><span>✦</span><span>✧</span></div>
   <header className="arcade-hero">
-   <div className="arcade-hero-copy"><span className="arcade-eyebrow"><span className="arcade-live-dot"/> C O D I K I D S · A R C A D E</span><h2 id="titulo-desafios">¡Tu próxima <em>aventura</em> comienza aquí!</h2><p>Ocho mundos para explorar, resolver acertijos y desafiar a la máquina. ¿Cuál eliges hoy?</p><div className="arcade-hero-stats"><span>🎮 <strong>8</strong> juegos</span><span>🤖 <strong>2</strong> duelos IA</span><span>✨ <strong>3</strong> estilos de desafío</span></div></div>
+   <div className="arcade-hero-copy"><span className="arcade-eyebrow"><span className="arcade-live-dot"/> C O D I K I D S · A R C A D E</span><h2 id="titulo-desafios">¡Tu próxima <em>aventura</em> comienza aquí!</h2><p>Explora juegos de tu nivel y aprende mientras te diviertes.</p><div className="arcade-hero-stats"><span>🎮 <strong>{catalogo.length}</strong> juegos</span><span>🤖 <strong>2</strong> duelos IA</span><span>✨ <strong>3</strong> estilos de desafío</span></div></div>
    <div className="arcade-hero-mascot" aria-hidden="true"><div className="arcade-orbit orbit-one"/><div className="arcade-orbit orbit-two"/><div className="arcade-mascot">👾</div><span className="arcade-spark spark-one">✦</span><span className="arcade-spark spark-two">✧</span><span className="arcade-spark spark-three">★</span></div>
   </header>
   <div className="arcade-featured" style={{'--acento':elegido.color,'--portada':elegido.fondo}}>
    <div className="arcade-featured-art"><Portada id={elegido.id}/><span className="arcade-featured-emblem">{ICONOS[elegido.id]}</span></div>
    <div className="arcade-featured-copy"><span className="arcade-featured-label">⭐ MISIÓN DESTACADA</span><h3>{elegido.titulo}</h3><p>{elegido.detalle}</p><div className="arcade-featured-actions"><button type="button" className="arcade-primary" onClick={()=>jugar(elegido.id)}>▶ ¡Jugar ahora!</button><span>🎯 {DIFICULTADES[elegido.id]}</span></div></div>
   </div>
-  <div className="arcade-toolbar"><div className="arcade-tabs" role="group" aria-label="Filtrar desafíos">{CATEGORIAS.map(c=><button key={c.id} type="button" className={categoria===c.id?'active':''} aria-pressed={categoria===c.id} onClick={()=>setCategoria(c.id)}>{c.icono} {c.nombre}</button>)}</div><label className="arcade-search"><span aria-hidden="true">⌕</span><input type="search" aria-label="Buscar juego" placeholder="Buscar un juego..." value={busqueda} onChange={e=>setBusqueda(e.target.value)}/></label></div>
+  <div className="arcade-toolbar"><div className="arcade-tabs" role="group" aria-label="Filtrar desafíos">{(nivel===1?CATEGORIAS.filter(c=>c.id==='todos'):CATEGORIAS).map(c=><button key={c.id} type="button" className={categoria===c.id?'active':''} aria-pressed={categoria===c.id} onClick={()=>setCategoria(c.id)}>{c.icono} {c.nombre}</button>)}</div><label className="arcade-search"><span aria-hidden="true">⌕</span><input type="search" aria-label="Buscar juego" placeholder="Buscar un juego..." value={busqueda} onChange={e=>setBusqueda(e.target.value)}/></label></div>
   <div className="arcade-section-heading"><div><span className="arcade-section-kicker">ELIGE TU DESAFÍO</span><h3>Explora los mundos <span>✦</span></h3></div><span className="arcade-counter">{visibles.length} {visibles.length===1?'juego':'juegos'}</span></div>
   {visibles.length?<div className="galeria-grid">{visibles.map((j,i)=><article key={j.id} className="galeria-juego" style={{'--acento':j.color,'--portada':j.fondo,'--orden':i}}>
    <div className="arcade-card-art"><Portada id={j.id}/><span className="arcade-card-icon">{ICONOS[j.id]}</span><span className="arcade-card-category">{GRUPOS[j.id]==='duelos'?'VS MÁQUINA':GRUPOS[j.id]==='ingenio'?'MENTE ACTIVA':'AVENTURA'}</span></div>
