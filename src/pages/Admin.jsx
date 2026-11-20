@@ -71,6 +71,14 @@ export default function Admin({ user, onLogout }) {
 
   function linkPadre(id) { return `${APP_URL}/padre/${id}` }
 
+  async function cambiarAccesoReto(habilitado) {
+    if (!estActivo || estActivo.nivel !== 1) return
+    const { error } = await supabase.from('estudiantes').update({ reto_explorador_habilitado: habilitado }).eq('id', estActivo.id)
+    if (error) { mostrarToast('No se pudo cambiar el permiso. Comprueba la migración SQL.'); return }
+    mostrarToast(habilitado ? 'Desafío avanzado habilitado' : 'Desafío avanzado bloqueado')
+    cargarDatos()
+  }
+
   async function cambiarNivel(nivel) {
     if (!estActivo || estActivo.nivel === nivel) return
     const { error } = await supabase.from('estudiantes').update({ nivel }).eq('id', estActivo.id)
@@ -197,6 +205,14 @@ export default function Admin({ user, onLogout }) {
                       </div>
                     </div>
 
+                    {estActivo.nivel === 1 && <div style={{padding:'1rem',marginBottom:'1rem',border:'1px solid #7F77DD',borderRadius:12}}>
+                      <strong>🏆 Desafío Maestro Explorador</strong>
+                      <p style={{fontSize:'.85rem',opacity:.75}}>Permiso individual para el juego avanzado. No cambia el nivel del estudiante.</p>
+                      <label style={{display:'flex',gap:10,alignItems:'center',marginTop:10}}>
+                        <input type="checkbox" checked={Boolean(estActivo.reto_explorador_habilitado)} onChange={e=>cambiarAccesoReto(e.target.checked)}/>
+                        {estActivo.reto_explorador_habilitado?'Habilitado':'Bloqueado'}
+                      </label>
+                    </div>}
                     {/* Link de padres */}
                     <div style={{ background:'rgba(29,158,117,.1)', border:'1px solid rgba(29,158,117,.25)', borderRadius:12, padding:'1rem', marginBottom:'1rem' }}>
                       <div style={{ fontSize:'.78rem', color:'rgba(255,255,255,.45)', marginBottom:6 }}>🔗 LINK PARA LOS PADRES</div>
