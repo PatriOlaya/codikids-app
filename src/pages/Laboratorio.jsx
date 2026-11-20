@@ -13,6 +13,9 @@ import TresEnRayaIA from '../components/TresEnRayaIA'
 import DueloMatematicoIA from '../components/DueloMatematicoIA'
 import Circuitos from '../components/Circuitos'
 
+const ExploradoresPlataformas = lazy(() => import('../components/ExploradoresPlataformas'))
+const ExploradoresReto = lazy(() => import('../components/ExploradoresReto'))
+
 const CircuitoTurbo = lazy(() => import('../components/CircuitoTurbo'))
 const Nucita = lazy(() => import('../components/Nucita'))
 const ArenaScratch3D = lazy(() => import('../components/ArenaScratch3D'))
@@ -30,6 +33,8 @@ export default function Laboratorio({ user, onLogout }) {
   const [enTresRaya,setEnTresRaya]=useState(false)
   const [enMatematicas,setEnMatematicas]=useState(false)
   const [enTurbo,setEnTurbo]=useState(false)
+  const [enPlataformas,setEnPlataformas]=useState(false)
+  const [enRetoExplorador,setEnRetoExplorador]=useState(false)
   const [enNucita, setEnNucita] = useState(false)
   const [enArena, setEnArena] = useState(false)
   const [enCircuitos, setEnCircuitos] = useState(false)
@@ -65,7 +70,7 @@ export default function Laboratorio({ user, onLogout }) {
       supabase.from('inventos').select('*').eq('estudiante_id', user.id).order('created_at', { ascending: false })
     ])
     setEstudiante(est)
-    const nivel = est?.nivel || 2
+    const nivel = est?.nivel || 1
     const misionesActuales = (mis || []).filter(m => m.nivel === nivel)
     const ids = new Set(misionesActuales.map(m => m.id))
     setMisiones(misionesActuales)
@@ -116,14 +121,15 @@ export default function Laboratorio({ user, onLogout }) {
           <button className="btn-ghost" onClick={onLogout} style={{ padding: '.5rem 1rem', fontSize: '.85rem' }}>Salir</button>
         </header>
 
-        <GaleriaDesafios abrir={{
+        <GaleriaDesafios nivel={estudiante?.nivel} retoHabilitado={Boolean(estudiante?.reto_explorador_habilitado)} abrir={{
+          plataformas:()=>setEnPlataformas(true), retoexplorador:()=>setEnRetoExplorador(true),
           turbo:()=>setEnTurbo(true), nucita:()=>setEnNucita(true), islas:()=>setEnArena(true),
           robot:()=>setEnCodigoRoto(true), circuito:()=>setEnCircuitos(true),
           espacio:()=>setEnMinijuego(true),
           tresraya:()=>setEnTresRaya(true), matematicas:()=>setEnMatematicas(true),
         }} />
 
-        {estudiante?.nivel !== 3 && <>
+        {estudiante?.nivel === 2 && <>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
           <div className="card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
             <div style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '1rem', alignSelf: 'flex-start' }}>Mi Planeta 🌍</div>
@@ -165,6 +171,8 @@ export default function Laboratorio({ user, onLogout }) {
 
         {estudiante?.nivel === 3 && <MundosNivel3 misiones={misiones} progreso={progreso} inventos={inventos} onJugar={() => setEnTaller(true)} onSubir={misionId => setModalInvento({ misionId })} />}
 
+        {estudiante?.nivel === 1 && enPlataformas && <Suspense fallback={<p>Cargando aventura…</p>}><ExploradoresPlataformas onCerrar={()=>setEnPlataformas(false)}/></Suspense>}
+        {estudiante?.nivel === 1 && estudiante?.reto_explorador_habilitado && enRetoExplorador && <Suspense fallback={<p>Cargando desafío…</p>}><ExploradoresReto onCerrar={()=>setEnRetoExplorador(false)}/></Suspense>}
         {enTurbo && <Suspense fallback={<div className="game-overlay"><p>Cargando Circuito Turbo…</p><button className="btn-ghost" onClick={()=>setEnTurbo(false)}>Cerrar</button></div>}><CircuitoTurbo estudianteId={user.id} onCerrar={()=>setEnTurbo(false)} /></Suspense>}
         {enNucita && <Suspense fallback={<div className="game-overlay"><p>Abriendo el cuento de Nucita…</p><button className="btn-ghost" onClick={()=>setEnNucita(false)}>Cerrar</button></div>}><Nucita estudianteId={user.id} onCerrar={()=>setEnNucita(false)} /></Suspense>}
         {enArena && <Suspense fallback={<div className="game-overlay"><p>Cargando Islas del Código 3D…</p><button className="btn-ghost" onClick={()=>setEnArena(false)}>Cerrar</button></div>}><ArenaScratch3D estudianteId={user.id} onCerrar={()=>setEnArena(false)} /></Suspense>}
@@ -174,7 +182,7 @@ export default function Laboratorio({ user, onLogout }) {
       {enMatematicas && <DueloMatematicoIA onCerrar={()=>setEnMatematicas(false)} />}
 
         {/* ── Mapa de Aventura ── */}
-        {estudiante?.nivel !== 3 && (
+        {estudiante?.nivel === 2 && (
         <div className="card" style={{ marginBottom:'1.5rem' }}>
           <h2 style={{ fontFamily:'var(--font-display)', fontWeight:600, fontSize:'1rem', marginBottom:'1.25rem' }}>🗺 Mapa de Aventura — Nivel {estudiante?.nivel}</h2>
           <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:'.75rem', marginBottom:'1rem' }}>
@@ -214,7 +222,7 @@ export default function Laboratorio({ user, onLogout }) {
         <div className="card">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
             <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '1rem' }}>Mis Inventos 🔬</h2>
-            {estudiante?.nivel !== 3 && <button className="btn-primary" style={{ padding: '.5rem 1rem', fontSize: '.85rem' }} onClick={() => setModalInvento({})}>+ Nuevo invento</button>}
+            {estudiante?.nivel === 2 && <button className="btn-primary" style={{ padding: '.5rem 1rem', fontSize: '.85rem' }} onClick={() => setModalInvento({})}>+ Nuevo invento</button>}
           </div>
           {inventos.length === 0
             ? <p style={{ color: 'rgba(255,255,255,.4)', fontSize: '.9rem' }}>Sube tu primer invento cuando completes una misión 🚀</p>
@@ -225,7 +233,7 @@ export default function Laboratorio({ user, onLogout }) {
         </div>
 
         {/* Insignias */}
-        {estudiante?.nivel !== 3 && <Insignias
+        {estudiante?.nivel === 2 && <Insignias
           misionesCompletadas={misionesCompletadas}
           habilidades={estudiante?.habilidades || []}
         />}
