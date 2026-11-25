@@ -13,6 +13,8 @@ import TresEnRayaIA from '../components/TresEnRayaIA'
 import DueloMatematicoIA from '../components/DueloMatematicoIA'
 import Circuitos from '../components/Circuitos'
 
+const ProyectosScratch = lazy(() => import('../components/ProyectosScratch'))
+
 const CircuitoTurbo = lazy(() => import('../components/CircuitoTurbo'))
 const Nucita = lazy(() => import('../components/Nucita'))
 const ArenaScratch3D = lazy(() => import('../components/ArenaScratch3D'))
@@ -30,6 +32,7 @@ export default function Laboratorio({ user, onLogout }) {
   const [enTresRaya,setEnTresRaya]=useState(false)
   const [enMatematicas,setEnMatematicas]=useState(false)
   const [enTurbo,setEnTurbo]=useState(false)
+  const [proyectoScratch, setProyectoScratch] = useState(null)
   const [enNucita, setEnNucita] = useState(false)
   const [enArena, setEnArena] = useState(false)
   const [enCircuitos, setEnCircuitos] = useState(false)
@@ -116,7 +119,8 @@ export default function Laboratorio({ user, onLogout }) {
           <button className="btn-ghost" onClick={onLogout} style={{ padding: '.5rem 1rem', fontSize: '.85rem' }}>Salir</button>
         </header>
 
-        <GaleriaDesafios abrir={{
+        <GaleriaDesafios nivel={estudiante?.nivel} abrir={{
+          estelarScratch:()=>setProyectoScratch('estelar'), portalScratch:()=>{if(Number(estudiante?.nivel)>=3)setProyectoScratch('portal')}, bosqueScratch:()=>setProyectoScratch('bosque'),
           turbo:()=>setEnTurbo(true), nucita:()=>setEnNucita(true), islas:()=>setEnArena(true),
           robot:()=>setEnCodigoRoto(true), circuito:()=>setEnCircuitos(true),
           espacio:()=>setEnMinijuego(true),
@@ -165,6 +169,7 @@ export default function Laboratorio({ user, onLogout }) {
 
         {estudiante?.nivel === 3 && <MundosNivel3 misiones={misiones} progreso={progreso} inventos={inventos} onJugar={() => setEnTaller(true)} onSubir={misionId => setModalInvento({ misionId })} />}
 
+        {proyectoScratch && <Suspense fallback={<div className="game-overlay" role="status">Cargando el proyecto de Scratch…</div>}><ProyectosScratch proyecto={proyectoScratch} onCerrar={()=>setProyectoScratch(null)} /></Suspense>}
         {enTurbo && <Suspense fallback={<div className="game-overlay"><p>Cargando Circuito Turbo…</p><button className="btn-ghost" onClick={()=>setEnTurbo(false)}>Cerrar</button></div>}><CircuitoTurbo estudianteId={user.id} onCerrar={()=>setEnTurbo(false)} /></Suspense>}
         {enNucita && <Suspense fallback={<div className="game-overlay"><p>Abriendo el cuento de Nucita…</p><button className="btn-ghost" onClick={()=>setEnNucita(false)}>Cerrar</button></div>}><Nucita estudianteId={user.id} onCerrar={()=>setEnNucita(false)} /></Suspense>}
         {enArena && <Suspense fallback={<div className="game-overlay"><p>Cargando Islas del Código 3D…</p><button className="btn-ghost" onClick={()=>setEnArena(false)}>Cerrar</button></div>}><ArenaScratch3D estudianteId={user.id} onCerrar={()=>setEnArena(false)} /></Suspense>}

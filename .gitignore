@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Generated Scratch player runtime; pinned npm dependency supplies these at build time.
+public/scratch/runtime.js
+public/scratch/runtime.NOTICES.txt
+public/scratch/runtime.LICENSE.txt
+
+__pycache__/

@@ -8,13 +8,17 @@
     "build": "vite build && node scripts/prerender.mjs",
     "lint": "oxlint",
     "preview": "vite preview",
-    "check:seo": "node scripts/check-seo.mjs"
+    "check:seo": "node scripts/check-seo.mjs",
+    "predev": "node scripts/prepare-scratch-runtime.mjs",
+    "prebuild": "node scripts/prepare-scratch-runtime.mjs",
+    "build:scratch": "python3 scripts/scratch/build_projects.py"
   },
   "dependencies": {
     "@dicebear/adventurer": "^7.2.0",
     "@dicebear/bottts": "^7.2.0",
     "@dicebear/core": "^7.2.0",
     "@supabase/supabase-js": "^2.110.2",
+    "@turbowarp/packager": "3.14.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-router-dom": "^7.18.1",

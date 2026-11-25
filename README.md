@@ -59,3 +59,25 @@ Los artículos citan documentación primaria de Scratch y Roblox.
 No se crean páginas para otras ciudades.
 No se configura una redirección del dominio antiguo porque requiere controlar su hosting.
 No se promete una posición en Google ni una fecha de indexación.
+
+## Proyectos nativos de Scratch
+
+La Central de Desafíos incluye `Aventura Estelar` (Nivel 1), `Guardianes del Portal`
+(Nivel 3) y `El bosque de los colores` (cuento animado con tres minijuegos).
+Todos los comportamientos están en bloques estándar de Scratch 3, sin extensiones.
+Los archivos editables y sus gráficos/sonidos están en `public/scratch/*.sb3`.
+Se pueden abrir con «Archivo → Cargar desde tu ordenador» en Scratch.
+
+- `npm run build:scratch` regenera los tres proyectos con Python 3 (biblioteca estándar).
+- `python3 -m unittest discover -s tests -p 'scratch*.py'` valida archivos, assets y referencias de bloques.
+- `public/scratch/player.html?proyecto=estelar|portal|bosque` reproduce cada archivo local.
+- `ProyectosScratch.jsx` abre el reproductor desde la galería y ofrece descargar el `.sb3`.
+- `predev` y `prebuild` copian el runtime y sus licencias desde `@turbowarp/packager@3.14.0`.
+  No hay CDN ni publicación de proyectos en una cuenta externa de Scratch.
+- El runtime conserva sus licencias y enlace al código fuente de TurboWarp; no contiene lógica de los juegos.
+- La tarjeta nueva de Nivel 3 se muestra a estudiantes de Nivel 3; la de Nivel 1 y el cuento están disponibles a todos.
+
+Validación manual automatizada con Chromium: carga de los tres archivos en el reproductor,
+victoria y cambio de los tres mundos de ambos juegos (moviendo personajes a objetivos para
+comprobar condiciones), gravedad/salto y cuento completo con ruta, luces, parejas,
+secuencia, desenlace y reinicio. Los tres `.sb3` también cargan en la VM oficial de Scratch.

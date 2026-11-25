@@ -2,6 +2,9 @@ import { useMemo, useState } from 'react'
 import './galeria-desafios.css'
 
 const JUEGOS=[
+ {id:'estelarScratch',titulo:'Aventura Estelar',tipo:'Scratch · Nivel 1 · Nuevo',detalle:'Pilota una nave, reúne estrellas y cruza tres mundos. Hecho con bloques de Scratch.',color:'#a6f8db',fondo:'#244c68'},
+ {id:'portalScratch',titulo:'Guardianes del Portal',tipo:'Scratch · Nivel 3 · Nuevo',detalle:'Doble salto, lava, drones y plataformas móviles. Activa los portales de tres mundos.',color:'#c6b8ff',fondo:'#393061',nivel:3},
+ {id:'bosqueScratch',titulo:'El bosque de los colores',tipo:'Animación Scratch · 3 minijuegos',detalle:'Elige compañero y camino. Ayuda al bosque con luciérnagas, memoria y una melodía.',color:'#ffdcaf',fondo:'#555078'},
  {id:'turbo',titulo:'Circuito Turbo',tipo:'Carreras 3D · Nuevo',detalle:'Corre en cuatro pistas y cambia de cámara o programa tu estrategia.',color:'#a4f9dc',fondo:'#225359'},
  {id:'nucita',titulo:'Nucita: el misterio del parque',tipo:'Cuento interactivo',detalle:'Resuelve el misterio del farol, explora dos rutas y descubre cuatro finales.',color:'#e4bbfa',fondo:'#43275d'},
  {id:'islas',titulo:'Islas del Código',tipo:'Aventura 3D',detalle:'Salta entre islas, esquiva pulsos y resuelve retos de Scratch.',color:'#91f4da',fondo:'#143f52'},
@@ -14,6 +17,7 @@ const JUEGOS=[
 function Portada({id}){
  return <svg viewBox="0 0 260 108" aria-hidden="true" className="galeria-portada">
  <g opacity=".35" fill="currentColor"><circle cx="213" cy="39" r="48"/><circle cx="24" cy="94" r="32"/><circle cx="34" cy="26" r="3"/><circle cx="192" cy="17" r="2"/><circle cx="228" cy="75" r="3"/><path d="M57 57l4-8 4 8-4 8zM190 76l4-8 4 8-4 8z"/></g>
+ {['estelarScratch','portalScratch','bosqueScratch'].includes(id)&&<g><path d="M20 95Q70 55 130 86T245 75V108H20Z" fill="#74b8a5"/><circle cx="205" cy="24" r="16" fill="#ffe7a5"/><text x="130" y="78" textAnchor="middle" fontSize="56">{id==='estelarScratch'?'🚀':id==='portalScratch'?'🌀':'🌳'}</text><path d="M35 75h45m95 18h45" stroke="#d0fff1" strokeWidth="8" strokeLinecap="round"/></g>}
  {id==='turbo'&&<g stroke="#bcffef" strokeWidth="3"><path d="M49 89l26-26h109l28 26z" fill="#314b66"/><path d="M92 66l18-23h46l18 23 14 9v15H77V75z" fill="#55bda9"/><path d="M110 47h46l13 18h-73z" fill="#203352"/><circle cx="104" cy="88" r="10" fill="#242842"/><circle cx="165" cy="88" r="10" fill="#242842"/><path d="M53 45h32m92-17h35m-30 24h45" strokeLinecap="round"/></g>}
  {id==='nucita'&&<g stroke="#654267" strokeWidth="3"><path d="M107 61Q80 8 98 7q11-3 25 38M135 44q6-39 20-39 15 4-4 54" fill="#fff1dc"/><ellipse cx="130" cy="69" rx="38" ry="31" fill="#fff1dc"/><path d="M112 64h1m32 0h1" stroke="#44304e" strokeWidth="7" strokeLinecap="round"/><path d="M125 76q5 7 10 0" fill="none"/><path d="M115 97l17-8 17 8-17 5z" fill="#ed92ae"/><circle cx="104" cy="76" r="5" fill="#f0a6b3" stroke="none"/><circle cx="154" cy="76" r="5" fill="#f0a6b3" stroke="none"/></g>}
  {id==='islas'&&<g stroke="#b2ffeb" strokeWidth="2"><path d="M80 52l52-19 53 17-54 21z" fill="#55bca5"/><path d="M80 52l51 19 54-21-15 35-39 14-32-15z" fill="#255c72"/><path d="M130 51V18m-10 7 10-10 10 10" fill="none"/><path d="M47 67l23-9 22 8-24 9zM171 81l25-9 25 8-25 10z" fill="#62caaf"/></g>}
@@ -30,20 +34,21 @@ const CATEGORIAS = [
  {id:'ingenio',nombre:'Ingenio',icono:'🧩'},
  {id:'duelos',nombre:'Contra la máquina',icono:'🤖'},
 ]
-const GRUPOS={turbo:'aventura',nucita:'aventura',islas:'aventura',robot:'ingenio',circuito:'ingenio',tresraya:'duelos',matematicas:'duelos',espacio:'aventura'}
-const ICONOS={turbo:'🏎️',nucita:'🐰',islas:'🏝️',robot:'🤖',circuito:'⚡',tresraya:'⭕',matematicas:'🧠',espacio:'🚀'}
-const DIFICULTADES={turbo:'Velocidad',nucita:'Exploración',islas:'Aventura',robot:'Lógica',circuito:'Ingenio',tresraya:'Estrategia',matematicas:'Cálculo',espacio:'Reflejos'}
-export default function GaleriaDesafios({abrir}){
+const GRUPOS={estelarScratch:'aventura',portalScratch:'aventura',bosqueScratch:'aventura',turbo:'aventura',nucita:'aventura',islas:'aventura',robot:'ingenio',circuito:'ingenio',tresraya:'duelos',matematicas:'duelos',espacio:'aventura'}
+const ICONOS={estelarScratch:'🚀',portalScratch:'🌀',bosqueScratch:'🌳',turbo:'🏎️',nucita:'🐰',islas:'🏝️',robot:'🤖',circuito:'⚡',tresraya:'⭕',matematicas:'🧠',espacio:'🚀'}
+const DIFICULTADES={estelarScratch:'Nivel 1 · Scratch',portalScratch:'Nivel 3 · Scratch',bosqueScratch:'Cuento · Scratch',turbo:'Velocidad',nucita:'Exploración',islas:'Aventura',robot:'Lógica',circuito:'Ingenio',tresraya:'Estrategia',matematicas:'Cálculo',espacio:'Reflejos'}
+export default function GaleriaDesafios({abrir,nivel=1}){
  const [categoria,setCategoria]=useState('todos')
  const [busqueda,setBusqueda]=useState('')
- const [destacado,setDestacado]=useState('islas')
- const visibles=useMemo(()=>JUEGOS.filter(j=>(categoria==='todos'||GRUPOS[j.id]===categoria)&&(`${j.titulo} ${j.tipo} ${j.detalle}`.toLocaleLowerCase('es').includes(busqueda.trim().toLocaleLowerCase('es')))),[categoria,busqueda])
- const elegido=JUEGOS.find(j=>j.id===destacado)||JUEGOS[0]
+ const [destacado,setDestacado]=useState('estelarScratch')
+ const disponibles=JUEGOS.filter(j=>!j.nivel||Number(nivel)>=j.nivel)
+ const visibles=useMemo(()=>JUEGOS.filter(j=>(!j.nivel||Number(nivel)>=j.nivel)&&(categoria==='todos'||GRUPOS[j.id]===categoria)&&(`${j.titulo} ${j.tipo} ${j.detalle}`.toLocaleLowerCase('es').includes(busqueda.trim().toLocaleLowerCase('es')))),[categoria,busqueda,nivel])
+ const elegido=disponibles.find(j=>j.id===destacado)||disponibles[0]
  function jugar(id){if(typeof abrir?.[id]==='function')abrir[id]()}
  return <section className="galeria-desafios" id="central-desafios" aria-labelledby="titulo-desafios">
   <div className="arcade-stars" aria-hidden="true"><span>✦</span><span>✧</span><span>✦</span><span>✧</span></div>
   <header className="arcade-hero">
-   <div className="arcade-hero-copy"><span className="arcade-eyebrow"><span className="arcade-live-dot"/> C O D I K I D S · A R C A D E</span><h2 id="titulo-desafios">¡Tu próxima <em>aventura</em> comienza aquí!</h2><p>Ocho mundos para explorar, resolver acertijos y desafiar a la máquina. ¿Cuál eliges hoy?</p><div className="arcade-hero-stats"><span>🎮 <strong>8</strong> juegos</span><span>🤖 <strong>2</strong> duelos IA</span><span>✨ <strong>3</strong> estilos de desafío</span></div></div>
+   <div className="arcade-hero-copy"><span className="arcade-eyebrow"><span className="arcade-live-dot"/> C O D I K I D S · A R C A D E</span><h2 id="titulo-desafios">¡Tu próxima <em>aventura</em> comienza aquí!</h2><p>Explora nuevos juegos y un cuento interactivo hechos con Scratch. ¡Elige tu próxima aventura!</p><div className="arcade-hero-stats"><span>🎮 <strong>{disponibles.length}</strong> experiencias</span><span>🤖 <strong>2</strong> duelos IA</span><span>✨ <strong>3</strong> estilos de desafío</span></div></div>
    <div className="arcade-hero-mascot" aria-hidden="true"><div className="arcade-orbit orbit-one"/><div className="arcade-orbit orbit-two"/><div className="arcade-mascot">👾</div><span className="arcade-spark spark-one">✦</span><span className="arcade-spark spark-two">✧</span><span className="arcade-spark spark-three">★</span></div>
   </header>
   <div className="arcade-featured" style={{'--acento':elegido.color,'--portada':elegido.fondo}}>

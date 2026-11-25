@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Scratch · CODIKIDS</title><style>
+*{box-sizing:border-box}body{margin:0;background:#161b35;color:#ecf4ff;font:14px system-ui,sans-serif}header{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#232942;flex-wrap:wrap}button,a{font:inherit;border:1px solid #ffffff40;color:#eff8ff;border-radius:8px;padding:8px 12px;text-decoration:none;background:#3c4765;cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid #a1f4d4;outline-offset:2px}button:disabled{opacity:.45;cursor:wait}#flag{color:#163936;background:#a5ecd5;font-weight:700}#project{width:100%;aspect-ratio:4/3;max-height:calc(100dvh - 105px);min-height:220px}#status{text-align:center;font-size:13px;padding:5px 10px;margin:0}footer{display:flex;justify-content:space-between;gap:10px;padding:5px 12px;font-size:10px;color:#b9c6dd}footer a{padding:0;border:0;background:none;font-size:10px;color:#b9c6dd}body.fullscreen #project{max-height:calc(100dvh - 100px)}
+</style><script src="runtime.js"></script></head><body>
+<header><button id="flag" disabled>⚑ Bandera verde</button><button id="stop" disabled>■ Detener</button><button id="fullscreen">⛶ Pantalla completa</button><a id="download" download>↓ Archivo Scratch</a></header>
+<p id="status" role="status">Cargando proyecto de Scratch…</p><div id="project" aria-label="Escenario interactivo de Scratch"></div>
+<footer><span>Programado con bloques de Scratch · CODIKIDS</span><a href="https://github.com/TurboWarp/packager" target="_blank" rel="noopener noreferrer">Reproductor TurboWarp · GPL-3.0 · Código fuente</a></footer>
+<script>
+(async()=>{
+ const proyectos={estelar:'Aventura_Estelar_Nivel_1.sb3',portal:'Guardianes_del_Portal_Nivel_3.sb3',bosque:'El_Bosque_de_los_Colores_Interactivo.sb3'};
+ const key=new URLSearchParams(location.search).get('proyecto');const file=proyectos[key];const status=document.getElementById('status');
+ const flag=document.getElementById('flag'),stop=document.getElementById('stop'),download=document.getElementById('download');
+ if(!file){status.textContent='No se encontró el proyecto. Regresa a la galería de CODIKIDS.';download.remove();return}
+ download.href=file;
+ try{
+  const p=new Scaffolding.Scaffolding();p.width=480;p.height=360;p.resizeMode='preserve-ratio';p.setup();p.appendTo(document.getElementById('project'));p.setAccentColor('#7762b6');
+  const response=await fetch(file);if(!response.ok)throw Error('No se pudo descargar el proyecto');
+  await p.loadProject(await response.arrayBuffer());window.player=p;window.projectReady=true;
+  flag.disabled=false;stop.disabled=false;status.textContent='Pulsa la bandera verde y sigue las instrucciones del escenario.';
+  flag.onclick=()=>{p.start();status.textContent='¡Listo para jugar! Puedes reiniciar con la bandera verde.'};stop.onclick=()=>{p.stopAll();status.textContent='Proyecto detenido. Pulsa la bandera verde para volver a comenzar.'};
+  document.getElementById('fullscreen').onclick=async()=>{try{if(!document.fullscreenElement)await document.documentElement.requestFullscreen();else await document.exitFullscreen()}catch{status.textContent='Amplía la ventana para ver mejor el escenario.'}};
+  document.addEventListener('fullscreenchange',()=>{document.body.classList.toggle('fullscreen',!!document.fullscreenElement);p.relayout()});
+ }catch(e){status.textContent='No se pudo cargar el reproductor. Descarga el archivo y ábrelo en Scratch, o vuelve a intentar.';console.error(e)}
+})();
+</script></body></html>
