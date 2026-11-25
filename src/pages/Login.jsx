@@ -13,7 +13,7 @@ export default function Login({ onLogin }) {
     setError('')
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) {
-      setError('Correo o contraseña incorrectos. ¡Inténtalo de nuevo!')
+      setError(error.code==='user_banned' || /banned/i.test(error.message || '') ? 'Tu acceso a CODIKIDS está en pausa. Comunícate con la academia para retomarlo.' : 'Correo o contraseña incorrectos. ¡Inténtalo de nuevo!')
       setLoading(false)
     } else {
       onLogin(data.user)

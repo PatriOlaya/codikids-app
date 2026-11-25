@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 const SLIDES = [
- { id:'scratch', titulo:'De jugador a creador', categoria:'VIDEOJUEGOS CON SCRATCH', texto:'Personajes, aventuras y mundos que nacen de sus propias ideas.', ruta:'/curso-scratch-para-ninos', enlace:'Descubre Scratch', acento:'#9cf4d8', icono:'✦' },
+ { id:'scratch', titulo:'Ideas que cobran vida', categoria:'CREATIVIDAD CON SCRATCH', texto:'Videojuegos, animaciones e historias interactivas que nacen de sus propias ideas.', ruta:'/curso-scratch-para-ninos', enlace:'Descubre Scratch', acento:'#9cf4d8', icono:'✦' },
  { id:'web', titulo:'Su primera página web', categoria:'PEQUEÑAS IDEAS, GRANDES WEBS', texto:'Diseña, experimenta y dale un lugar en internet a su imaginación.', ruta:'/curso-creacion-paginas-web-para-ninos', enlace:'Explora creación web', acento:'#c9b9ff', icono:'</>' },
  { id:'robot', titulo:'Ideas que se mueven', categoria:'PRINCIPIOS DE ROBÓTICA', texto:'Descubre cómo las instrucciones pueden poner una idea en movimiento.', ruta:'/principios-de-robotica-para-ninos', enlace:'Conoce robótica', acento:'#ffd690', icono:'⚡' },
 ]

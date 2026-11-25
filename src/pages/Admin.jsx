@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import Certificado from '../components/Certificado'
+import StudentAccess from '../components/StudentAccess'
+import { ReviewsList } from '../marketing/FamilyReviews'
 
 const APP_URL = 'https://codikids-app.vercel.app'
 
@@ -129,13 +131,15 @@ export default function Admin({ user, onLogout }) {
         </header>
 
         {/* Tabs */}
-        <div style={{ display:'flex', gap:8, marginBottom:'1.5rem' }}>
-          {[['estudiantes','👨‍🎓 Estudiantes'],['misiones','✅ Misiones']].map(([tab, label]) => (
+        <div style={{ display:'flex', flexWrap:'wrap', gap:8, marginBottom:'1.5rem' }}>
+          {[['estudiantes','👨‍🎓 Estudiantes'],['misiones','✅ Misiones'],['familias','💬 Familias']].map(([tab, label]) => (
             <button key={tab} onClick={() => setActiveTab(tab)} style={{ padding:'.6rem 1.2rem', borderRadius:99, border:`1px solid ${activeTab===tab ? 'rgba(127,119,221,.5)' : 'rgba(255,255,255,.12)'}`, background: activeTab===tab ? 'rgba(127,119,221,.2)' : 'transparent', color:activeTab===tab ? '#fff' : 'rgba(255,255,255,.5)', fontFamily:'var(--font-body)', fontWeight:700, fontSize:'.9rem', cursor:'pointer' }}>
               {label}
             </button>
           ))}
         </div>
+
+        {activeTab === 'familias' && <section className="fr-admin"><h2>Comentarios de las familias</h2><p>Los comentarios autorizados aparecen directamente en la landing. Desde aquí puedes retirarlos si una familia te lo solicita.</p><div className="fr-admin-link"><a href={`${APP_URL}/comparte-tu-experiencia`} target="_blank" rel="noopener noreferrer">Abrir formulario para familias ↗</a><button type="button" onClick={()=>copiar(`${APP_URL}/comparte-tu-experiencia`,'Enlace para las familias copiado ✅')}>Copiar enlace para enviar</button></div><ReviewsList admin token={async()=>{const {data}=await supabase.auth.getSession();return data.session?.access_token || ''}}/></section>}
 
         {/* ══════════════ TAB ESTUDIANTES ══════════════ */}
         {activeTab === 'estudiantes' && (
@@ -177,6 +181,7 @@ export default function Admin({ user, onLogout }) {
               {/* Detalle estudiante */}
               {estActivo && (
                 <div style={{ display:'flex', flexDirection:'column', gap:'1rem' }}>
+                  <StudentAccess key={estActivo.id} studentId={estActivo.id} nombre={estActivo.nombre}/>
 
                   {/* Info del estudiante */}
                   <div className="card">

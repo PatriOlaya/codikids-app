@@ -1,6 +1,18 @@
 {
   "rewrites": [
     {
+      "source": "/blog/minecraft-seguridad-guia-padres",
+      "destination": "/blog/minecraft-seguridad-guia-padres/index.html"
+    },
+    {
+      "source": "/blog/roblox-seguridad-controles-parentales",
+      "destination": "/blog/roblox-seguridad-controles-parentales/index.html"
+    },
+    {
+      "source": "/comparte-tu-experiencia",
+      "destination": "/comparte-tu-experiencia/index.html"
+    },
+    {
       "source": "/curso-creacion-paginas-web-para-ninos",
       "destination": "/curso-creacion-paginas-web-para-ninos/index.html"
     },

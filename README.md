@@ -81,3 +81,24 @@ Validación manual automatizada con Chromium: carga de los tres archivos en el r
 victoria y cambio de los tres mundos de ambos juegos (moviendo personajes a objetivos para
 comprobar condiciones), gravedad/salto y cuento completo con ruta, luces, parejas,
 secuencia, desenlace y reinicio. Los tres `.sb3` también cargan en la VM oficial de Scratch.
+
+## Comentarios de familias y control de acceso
+
+- `/comparte-tu-experiencia` permite enviar un nombre público y un comentario, con autorización expresa.
+  Los comentarios aparecen en `/#familias` y en el curso de Scratch al consultar de nuevo la sección.
+- `api/reviews.js` guarda cada envío como JSON independiente en un bucket **privado** de Supabase Storage:
+  `codikids-family-reviews`. Lo crea en el primer envío válido. No requiere una migración SQL.
+  Usa `SUPABASE_SERVICE_KEY` y `SUPABASE_URL` (o `VITE_SUPABASE_URL`) existentes en el servidor.
+  Solo expone nombre, comentario, fecha e ID; no publica los registros de consentimiento ni límites.
+- Antiduplicados por UUID de envío y límite atómico de una publicación por conexión/día de Bogotá.
+  No guarda IP sin procesar. Un fallo de almacenamiento no se presenta como éxito.
+- Panel Admin → Familias: copiar el enlace y retirar comentarios. Las bajas requieren autenticación de administradora.
+- Panel Admin → Estudiantes → seleccionar: **Cerrar acceso / Reactivar acceso**. `api/student-access.js`
+  verifica que sea un estudiante existente, protege la cuenta administradora y cambia solo Auth/metadatos.
+  No elimina estudiantes, proyectos ni progreso. El veto impide nuevos inicios y renovación de sesión.
+- `StudentAccessGuard` consulta el estado actual del servidor al entrar, al regresar a la pestaña y cada 30 s
+  mientras está visible. Retira el laboratorio si el acceso fue cerrado. No confía en metadatos de un JWT antiguo.
+  Supabase no invalida de inmediato los JWT emitidos anteriormente: las políticas RLS existentes sobre datos
+  propios siguen vigentes hasta su expiración; el guard controla el acceso a la interfaz del laboratorio.
+- El formulario, los dos artículos de seguridad y las rutas nuevas se prerenderizan. Las fuentes oficiales
+  y fechas de actualización están en cada artículo; no se incluyen testimonios de muestra en producción.

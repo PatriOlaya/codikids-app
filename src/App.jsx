@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { supabase } from './lib/supabase'
+import StudentAccessGuard from './components/StudentAccessGuard'
 
 const Landing = lazy(() => import('./marketing/PublicSite'))
 const Login = lazy(() => import('./pages/Login'))
@@ -45,7 +46,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/entrar" element={user ? <Navigate to={isAdmin ? '/admin' : '/laboratorio'} replace /> : <Login onLogin={setUser} />} />
-          <Route path="/laboratorio" element={user && !isAdmin ? <Laboratorio user={user} onLogout={handleLogout} /> : <Navigate to="/entrar" replace />} />
+          <Route path="/laboratorio" element={user && !isAdmin ? <StudentAccessGuard user={user} onLogout={handleLogout}><Laboratorio user={user} onLogout={handleLogout} /></StudentAccessGuard> : <Navigate to="/entrar" replace />} />
           <Route path="/admin" element={isAdmin ? <Admin user={user} onLogout={handleLogout} /> : <Navigate to="/entrar" replace />} />
           <Route path="/padre/:estudianteId" element={<VistaParent />} />
           <Route path="*" element={<Navigate to="/" replace />} />
