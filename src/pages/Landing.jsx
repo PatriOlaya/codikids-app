@@ -42,7 +42,7 @@ export default function Landing() {
 
         {/* Mini stats */}
         <div style={{ display: 'flex', gap: '2rem', marginTop: '3.5rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-          {[['8-12','años'],['Online','clases en vivo'],['Colombia','cobertura'],['Nivel 2','abierto']].map(([v,l]) => (
+          {[['7-12','años'],['Online','clases en vivo'],['Colombia','cobertura'],['Nivel 2','abierto']].map(([v,l]) => (
             <div key={l} style={{ textAlign: 'center' }}>
               <div style={{ fontFamily: 'Space Grotesk,sans-serif', fontSize: '1.6rem', fontWeight: 700, color: '#7F77DD' }}>{v}</div>
               <div style={{ fontSize: '.78rem', color: 'rgba(255,255,255,.4)', marginTop: 2 }}>{l}</div>
@@ -54,7 +54,7 @@ export default function Landing() {
       {/* KIT DESCARGABLE */}
       <section id="aprende-a-tu-ritmo" aria-labelledby="kit-title" style={{ padding: '3rem 1.5rem', maxWidth: 900, margin: '0 auto' }}>
         <div style={{ border: '1px solid rgba(93,202,165,.35)', borderRadius: 24, background: 'rgba(93,202,165,.06)', padding: 'clamp(1.5rem,4vw,3rem)' }}>
-          <p style={{ color: '#5DCAA5', fontWeight: 800, letterSpacing: 1 }}>KIT DE MISIONES · 8–12 AÑOS</p>
+          <p style={{ color: '#5DCAA5', fontWeight: 800, letterSpacing: 1 }}>KIT DE MISIONES · 7–12 AÑOS</p>
           <h2 id="kit-title" style={{ fontFamily: 'Space Grotesk,sans-serif', fontSize: 'clamp(1.6rem,4vw,2.4rem)', lineHeight: 1.2 }}>¿Prefieres aprender programación sin clases en vivo?</h2>
           <p style={{ color: 'rgba(255,255,255,.75)', lineHeight: 1.8 }}>Con el Kit de Misiones CODIKIDS, tu hijo crea su primer videojuego en Scratch a su ritmo. Incluye 30 misiones en español, recursos, proyectos de solución y orientación para padres.</p>
           <p style={{ color: 'rgba(255,255,255,.65)', lineHeight: 1.7 }}>Necesita computador con teclado y un adulto para empezar. Es un kit descargable; no incluye clases en vivo ni tutorías individuales.</p>

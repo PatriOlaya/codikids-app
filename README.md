@@ -36,7 +36,7 @@ robots.txt permite rastrear las páginas privadas para que los buscadores puedan
 Las URL desconocidas usan la página 404 de Vercel, sin redirección a Home.
 Los enlaces públicos usan href reales y navegación de documento para conservar metadata por URL.
 El contenido público no espera Supabase ni carga el laboratorio.
-Assets con hash tienen caché immutable. Fuentes del sistema evitan peticiones de fuentes externas.
+Assets con hash tienen caché immutable. Las páginas públicas usan Fredoka para títulos y Nunito Sans para lectura, alojadas localmente desde dependencias fijadas. Sus licencias OFL están en public/fonts.
 El hero usa HTML/CSS y no requiere una imagen pesada para mostrar su contenido.
 
 ## Validaciones y límites

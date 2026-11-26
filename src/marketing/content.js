@@ -6,7 +6,7 @@ export const levels = [
   ['Maestro', 'Diseña un juego de plataformas', 'Saltos, gravedad, colisiones, escenarios, power-ups y pausa.', 'Un mundo de plataformas con reglas propias.'],
 ]
 export const faq = [
-  ['¿Para qué edades es el curso?', 'CODIKIDS recomienda sus clases para niños de 8 a 12 años. Si tu hijo está fuera de ese rango, consultamos su experiencia y autonomía antes de recomendar una ruta.'],
+  ['¿Para qué edades es el curso?', 'CODIKIDS recomienda sus clases para niños de 7 a 12 años. Si tu hijo está fuera de ese rango, consultamos su experiencia y autonomía antes de recomendar una ruta.'],
   ['¿Necesita experiencia?', 'Exploradores empieza desde cero. Para Ninja y Maestro revisamos los conocimientos previos, no solo la edad.'],
   ['¿Cómo son las clases?', 'Son online y en vivo. Cada nivel tiene 8 clases de 45 minutos, con explicación, práctica guiada y un proyecto que crece en cada sesión. Consulta horarios y disponibilidad por WhatsApp.'],
   ['¿Qué necesita para participar?', 'Un computador con teclado, conexión a internet y acceso a Scratch. Un adulto puede ayudar con la configuración inicial.'],
@@ -157,7 +157,7 @@ export const articles = [
     ['Cómo lo practicamos en CODIKIDS', 'Cada nivel desarrolla un proyecto en ocho clases. Empezamos con reglas simples y añadimos dificultad de forma gradual; el niño comparte sus inventos y recibe revisión de sus misiones.'],
   ], sources: [['Acerca de Scratch', 'https://scratch.mit.edu/help/about']] },
   { slug: 'mejor-edad-para-aprender-scratch', title: '¿Cuál es la mejor edad para aprender Scratch?', description: 'Guía para familias sobre edades, autonomía y conocimientos previos al comenzar a crear juegos con Scratch.', sections: [
-    ['La edad es una orientación', 'Scratch está diseñado especialmente para edades de 8 a 16 años, aunque lo usan personas de otras edades. En CODIKIDS recomendamos las clases para niños de 8 a 12 años y revisamos los casos fuera de ese rango individualmente.'],
+    ['La edad es una orientación', 'Scratch está diseñado especialmente para edades de 8 a 16 años, aunque lo usan personas de otras edades. En CODIKIDS recomendamos las clases para niños de 7 a 12 años y revisamos los casos fuera de ese rango individualmente.'],
     ['Señales para comenzar', 'Más que cumplir una edad exacta, ayuda poder seguir instrucciones cortas, reconocer letras y números, usar el teclado y expresar una idea. No necesita dominar todas las herramientas antes de comenzar.'],
     ['Si todavía necesita mucho acompañamiento', 'Para un niño más pequeño, empieza con actividades breves de secuencias y movimiento con un adulto. Evita exigir una clase larga si todavía necesita ayuda constante para leer o manejar el computador.'],
     ['Si ya conoce Scratch', 'La edad no determina el nivel. Comprueba si puede usar eventos, condiciones y variables en un proyecto propio. Ese punto de partida ayuda a elegir entre Exploradores, Ninja y Maestro.'],

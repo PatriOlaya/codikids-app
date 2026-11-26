@@ -17,6 +17,8 @@
     "@dicebear/adventurer": "^7.2.0",
     "@dicebear/bottts": "^7.2.0",
     "@dicebear/core": "^7.2.0",
+    "@fontsource-variable/fredoka": "5.3.0",
+    "@fontsource-variable/nunito-sans": "5.3.0",
     "@supabase/supabase-js": "^2.110.2",
     "@turbowarp/packager": "3.14.0",
     "react": "^19.2.7",

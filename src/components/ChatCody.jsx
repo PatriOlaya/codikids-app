@@ -9,12 +9,12 @@ const FAQ = [
   // ── QUÉ ES CODIKIDS
   {
     claves: ['qué es','que es','codikids','de qué','de que','trata','cuéntame','cuentame','información','informacion'],
-    respuesta: '¡CodiKids es una academia virtual de programación para niños de 8 a 12 años! 🚀\n\nAquí los niños no solo aprenden tecnología — aprenden a CREARLA. Construyen sus propios videojuegos con Scratch en clases en vivo online, guiados por una profe certificada.'
+    respuesta: '¡CodiKids es una academia virtual de programación para niños de 7 a 12 años! 🚀\n\nAquí los niños no solo aprenden tecnología — aprenden a CREARLA. Construyen sus propios videojuegos con Scratch en clases en vivo online, guiados por una profe certificada.'
   },
   // ── EDADES
   {
     claves: ['edad','edades','años','cuantos años','cuántos años','pequeño','grande','hijo tiene','niña tiene'],
-    respuesta: 'CodiKids es para niños y niñas de 8 a 12 años 🎯\n\nSi tu hijo está en ese rango, ¡puede inscribirse! Si tiene menos de 8 o más de 12, escríbele a Patricia por WhatsApp para evaluar su caso.'
+    respuesta: 'CodiKids es para niños y niñas de 7 a 12 años 🎯\n\nSi tu hijo está en ese rango, ¡puede inscribirse! Si tiene menos de 7 o más de 12, escríbele a Patricia por WhatsApp para evaluar su caso.'
   },
   // ── PRECIO / COSTO
   {
